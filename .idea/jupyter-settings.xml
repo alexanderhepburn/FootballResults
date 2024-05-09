@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JupyterPersistentConnectionParameters">
+    <option name="knownRemoteServers">
+      <list>
+        <JupyterConnectionParameters>
+          <option name="authType" value="notebook" />
+          <option name="token" value="43b51768018856d53ed600aa8c9d7407c8b5b0346c21ea87" />
+          <option name="urlString" value="http://127.0.0.1:8888/tree" />
+          <authParams2>
+            <map>
+              <entry key="token" value="43b51768018856d53ed600aa8c9d7407c8b5b0346c21ea87" />
+            </map>
+          </authParams2>
+        </JupyterConnectionParameters>
+        <JupyterConnectionParameters>
+          <option name="authType" value="notebook" />
+          <option name="token" value="12f83507dfc2cb5c1cb5b4caf9760d636e70596ed113a7db" />
+          <option name="urlString" value="http://localhost:8888/tree" />
+          <authParams2>
+            <map>
+              <entry key="token" value="12f83507dfc2cb5c1cb5b4caf9760d636e70596ed113a7db" />
+            </map>
+          </authParams2>
+        </JupyterConnectionParameters>
+      </list>
+    </option>
+    <option name="moduleParameters">
+      <map>
+        <entry key="$PROJECT_DIR$/../Aufgabe1/.idea/Aufgabe1.iml">
+          <value>
+            <JupyterConnectionParameters>
+              <option name="managed" value="true" />
+            </JupyterConnectionParameters>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
