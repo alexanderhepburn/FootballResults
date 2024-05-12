@@ -8,7 +8,8 @@ class command_manager:
 
     def run_program(self):
         self.__list_of_commands = {"help": {"function" : self.info, "description" : "This function helps you"},
-                                   "gamesplayed": {"function" : self.total_games, "description" : "INPUT DESCR"}}
+                                   "gamesplayed": {"function" : self.total_games, "description" : "INPUT DESCR"},
+                                   "teams": {"function" : self.print_teams, "description" : "INPUT DESCR"}}
 
         print(f"Welcome to the FootballResults program!")
         print(f"For a list of all commands, please type help.")
@@ -52,5 +53,14 @@ class command_manager:
 
             total_number_of_games = ((df['HomeTeam'] == team_name) | (df['AwayTeam'] == team_name)).sum()
             print(f"Team: {team_name}, has played a total of {total_number_of_games} times!")
+        except:
+            print("ERRORORROROROROR")
+
+    def print_teams(self):
+        try:
+            df = data_manager.get_all_data()
+            unique_values_list = list(set(df['HomeTeam'].unique()).union(df['AwayTeam'].unique()))
+
+            print(unique_values_list)
         except:
             print("ERRORORROROROROR")
