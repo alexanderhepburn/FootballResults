@@ -4,7 +4,8 @@
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
 from command_manager import command_manager
+from network_manager import network_manager
 
 if __name__ == '__main__':
+    #network_manager.get_all_years(23, 23)
     command_manager().run_program()
-

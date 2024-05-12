@@ -9,7 +9,9 @@ class command_manager:
     def run_program(self):
         self.__list_of_commands = {"help": {"function" : self.info, "description" : "This function helps you"},
                                    "gamesplayed": {"function" : self.total_games, "description" : "INPUT DESCR"},
-                                   "teams": {"function" : self.print_teams, "description" : "INPUT DESCR"}}
+                                   "teams": {"function" : self.print_teams, "description" : "Print all available teams."},
+                                   "settings": {"function" : self.settings, "description" : "Change the current app settings."},
+                                   "analyse": {"function" : self.analyse_teams, "description" : "Analyse two teams."}}
 
         print(f"Welcome to the FootballResults program!")
         print(f"For a list of all commands, please type help.")
@@ -28,8 +30,8 @@ class command_manager:
                     continue
 
                 self.__list_of_commands[user_input]["function"]()
-            except KeyError:
-                print("Error Function")
+            except KeyError as e:
+                print(f"Error Run Program: {e}")
 
     def info(self):
         print(f"\nPrinting all of the available commands:")
@@ -53,14 +55,26 @@ class command_manager:
 
             total_number_of_games = ((df['HomeTeam'] == team_name) | (df['AwayTeam'] == team_name)).sum()
             print(f"Team: {team_name}, has played a total of {total_number_of_games} times!")
-        except:
-            print("ERRORORROROROROR")
+        except Exception as e:
+            print(f"Total Games Error: {e}")
 
     def print_teams(self):
-        try:
-            df = data_manager.get_all_data()
-            unique_values_list = list(set(df['HomeTeam'].unique()).union(df['AwayTeam'].unique()))
+        print(data_manager.get_all_teams())
 
-            print(unique_values_list)
-        except:
-            print("ERRORORROROROROR")
+    def settings(self):
+        print("WPI")
+        # Einige Einstellungen beispielsweise Jahre und League?
+
+    def analyse_teams(self):
+        team_list = []
+        while True:
+            team_input = input(f"Enter team name #{len(team_list) + 1}: ")
+            if team_input in data_manager.get_all_teams():
+                team_list.append(team_input)
+            else:
+                print("Error please enter a valid team name.")
+
+            if len(team_list) == 2:
+                break
+
+        print("Starting analyse")

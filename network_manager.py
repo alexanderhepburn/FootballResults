@@ -6,10 +6,11 @@ class network_manager:
     @staticmethod
     def get_data(year):
         try:
-            url = f"https://www.football-data.co.uk/mmz4281/{year-1}{year}/E0.csv"
+            add_zero_to_year = lambda year: str(year).zfill(2)
+            url = f"https://www.football-data.co.uk/mmz4281/{add_zero_to_year(year-1)}{add_zero_to_year(year)}/E0.csv"
             response = requests.get(url)
 
-            output = open(f"data/{year-1}{year}.csv", "wb")
+            output = open(f"data/{add_zero_to_year(year-1)}{add_zero_to_year(year)}.csv", "wb")
             output.write(response.content)
             output.close()
         except:
