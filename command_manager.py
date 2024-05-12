@@ -1,4 +1,6 @@
 import pandas as pd
+
+from data_manager import data_manager
 from network_manager import network_manager
 from tabulate import tabulate
 
@@ -6,10 +8,11 @@ class command_manager:
 
     def run_program(self):
         self.__list_of_commands = {"help": {"function" : self.info, "description" : "This function helps you"},
-                                   "leagues": {"function" : self.get_leagues, "description" : "INPUT DESCR"}}
+                                   "gamesplayed": {"function" : self.total_games, "description" : "INPUT DESCR"}}
 
         print(f"Welcome to the FootballResults program!")
         print(f"For a list of all commands, please type help.")
+
         while True:
             try:
                 user_input = input(f"Please enter your command: ")
@@ -36,13 +39,18 @@ class command_manager:
                 print(f"{method}: No description")
         print("") # Adding space for readibility
 
-    def get_leagues(self):
+    def total_games(self):
         try:
-            request_information = f"leagues"
-            results = network_manager.get_json_data(request_information)
-            df = pd.DataFrame(results["data"])
-            df.set_index("id", inplace=True)
+            df = data_manager.get_all_data()
+            while True:
+                team_name = input("Please input team name: ").capitalize()
+                if (team_name in df['HomeTeam'].values) or (team_name in df['AwayTeam'].values):
+                    break
+                print("Error team not found, please try again!")
 
-            print(tabulate(df[['name']], headers='keys', tablefmt='psql'))
+            print("team found")
+
+            total_number_of_games = ((df['HomeTeam'] == team_name) | (df['AwayTeam'] == team_name)).sum()
+            print(f"Team: {team_name}, has played a total of {total_number_of_games} times!")
         except:
             print("ERRORORROROROROR")

@@ -2,14 +2,21 @@ import pandas as pd
 import requests
 
 class network_manager:
+
     @staticmethod
-    def get_json_data(request):
-        __token_id = "PIPsnX8gPx038gU8dJgt1JBMaBN893Yc5RBdB8gcSOTXE6l9VDgqLBl3DuYv"
-        url = f"https://api.sportmonks.com/v3/football/{request}?api_token={__token_id}"
-        response = requests.get(url)
-        if response.status_code == 200:
-            json_data = response.json()
-            return json_data
-        else:
-            print("ERROR")
-            return None
+    def get_data(year):
+        try:
+            url = f"https://www.football-data.co.uk/mmz4281/{year-1}{year}/E0.csv"
+            response = requests.get(url)
+
+            output = open(f"data/{year-1}{year}.csv", "wb")
+            output.write(response.content)
+            output.close()
+        except:
+            print("Error")
+
+    @staticmethod
+    def get_all_years(ending_year, years):
+        year_array = [ending_year - i for i in range(years)]
+        for year in year_array:
+            network_manager.get_data(year)
