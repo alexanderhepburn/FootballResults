@@ -39,6 +39,6 @@ class network_manager:
     @staticmethod
     def setup():
         DIR = 'data/E0'
-        if len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]) < 10:
+        if not os.path.isdir('data'):
             print(f"{Colour.BLUE}Data upgrade required.")
             network_manager.get_all_data()
