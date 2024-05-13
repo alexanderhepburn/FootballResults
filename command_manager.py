@@ -3,7 +3,7 @@ import pandas as pd
 from data_manager import data_manager
 from network_manager import network_manager
 from tabulate import tabulate
-from settings_manager import settings_manager
+from settings_manager import settings_manager, InvalidValueError
 
 class command_manager:
 
@@ -12,14 +12,16 @@ class command_manager:
                                    "gamesplayed": {"function" : self.total_games, "description" : "INPUT DESCR"},
                                    "teams": {"function" : self.print_teams, "description" : "Print all available teams."},
                                    "settings": {"function" : self.settings, "description" : "Change the current app settings."},
-                                   "analyse": {"function" : self.analyse_teams, "description" : "Analyse two teams."}}
+                                   "analyse": {"function" : self.analyse_teams, "description" : "Analyse two teams."},
+                                   "update_data": {"function": self.update_data, "description": "Updates all the data."}}
 
         print(f"Welcome to the FootballResults program!")
-        print(f"For a list of all commands, please type help.")
+        print(f"For a list of all commands, please type {Colour.GREEN}help{Colour.END}.")
 
         while True:
             try:
-                user_input = input(f"Please enter your command: ")
+                user_input = input(f"Please enter your command: {Colour.GREEN}")
+                print(Colour.END, end="")
 
                 if user_input == "end":
                     print(f"Thank you for using our program! Bye!")
@@ -27,7 +29,7 @@ class command_manager:
 
                 if not user_input in self.__list_of_commands:
                     print(f"Error your command: {user_input} is not a valid input!")
-                    print(f"Please reenter your command or type help for a directory of all commands.")
+                    print(f"Please reenter your command or type {Colour.GREEN}help{Colour.END} for a directory of all commands.")
                     continue
 
                 self.__list_of_commands[user_input]["function"]()
@@ -38,9 +40,9 @@ class command_manager:
         print(f"\nPrinting all of the available commands:")
         for method, contents in self.__list_of_commands.items():
             try:
-                print(f"{method}: {contents['description']}")
+                print(f"{Colour.GREEN}{method}{Colour.END}: {Colour.PURPLE}{contents['description']}{Colour.END}")
             except KeyError:
-                print(f"{method}: No description")
+                print(f"{Colour.GREEN}{method}{Colour.END}: {Colour.RED}No description{Colour.END}")
         print("") # Adding space for readibility
 
     def total_games(self):
@@ -93,14 +95,18 @@ class command_manager:
 
             try:
                 new_value_to_update = required_type(inputted_change)
+                new_settings = settings.get_settings()
+                new_settings[settings.settings_data[settings_number - 1]["setting"]] = new_value_to_update
+                settings_manager().update_settings(new_settings)
+                print(f"{Colour.GREEN}Success! {settings.settings_data[settings_number - 1]['formatted_name']} as been updated to: {Colour.PURPLE}{new_value_to_update}{Colour.END}")
                 break
             except ValueError as e:
                 print(f"{Colour.RED}Invalid Input: Only {required_type} can be entered ({inputted_change} is not of type {required_type}){Colour.END}")
+            except InvalidValueError as e:
+                print(f"{Colour.RED}Invalid Input ({new_value_to_update}): accepted are {settings.settings_data[settings_number - 1]['accepted_inputs']}{Colour.END}")
             except Exception as e:
                 print(f"{Colour.RED}Invalid Input: {e}{Colour.END}")
 
-        new_settings = settings.get_settings()
-        #new_settings[settings.settings_data[settings_number]["setting"]] =
 
 
 
@@ -117,6 +123,10 @@ class command_manager:
                 break
 
         print("Starting analyse")
+
+    def update_data(self):
+        print(f"{Colour.GREEN}Updating data!{Colour.END}")
+        network_manager.get_all_data()
 
 
 class Colour:

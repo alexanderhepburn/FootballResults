@@ -1,23 +1,29 @@
 import pandas as pd
 import requests
+from settings_manager import settings_manager
+import os
 
 class network_manager:
 
     @staticmethod
-    def get_data(year):
+    def get_data(year, league):
         try:
-            add_zero_to_year = lambda year: str(year).zfill(2)
-            url = f"https://www.football-data.co.uk/mmz4281/{add_zero_to_year(year-1)}{add_zero_to_year(year)}/E0.csv"
+            formatted_year = f"{(year % 100)-1}{(year % 100)}"
+            url = f"https://www.football-data.co.uk/mmz4281/{formatted_year}/{league}.csv"
             response = requests.get(url)
 
-            output = open(f"data/{add_zero_to_year(year-1)}{add_zero_to_year(year)}.csv", "wb")
+            os.makedirs(f"data/{league}", exist_ok=True)
+
+            output = open(f"data/{league}/{formatted_year}.csv", "wb")
             output.write(response.content)
             output.close()
-        except:
-            print("Error")
+        except Exception as e:
+            print(f"Error Get_data: {e}")
 
     @staticmethod
-    def get_all_years(ending_year, years):
-        year_array = [ending_year - i for i in range(years)]
-        for year in year_array:
-            network_manager.get_data(year)
+    def get_all_data():
+        settings = settings_manager()
+        year_array = [x for x in range(settings.min_start_year, settings.max_end_year)]
+        for league in settings.accepted_leagues:
+            for year in year_array:
+                network_manager.get_data(year, league)
