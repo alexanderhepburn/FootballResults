@@ -4,6 +4,8 @@
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
 from command_manager import command_manager
+from settings_manager import settings_manager
+from data_manager import data_manager
 from network_manager import network_manager
 
 if __name__ == '__main__':

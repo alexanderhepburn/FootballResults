@@ -3,6 +3,7 @@ import pandas as pd
 from data_manager import data_manager
 from network_manager import network_manager
 from tabulate import tabulate
+from settings_manager import settings_manager
 
 class command_manager:
 
@@ -62,8 +63,46 @@ class command_manager:
         print(data_manager.get_all_teams())
 
     def settings(self):
-        print("WPI")
-        # Einige Einstellungen beispielsweise Jahre und League?
+        settings = settings_manager()
+        print("Here are your current settings:")
+
+        for index, item in enumerate(settings.settings_data):
+            print(f"{item['formatted_name']} ({Colour.PURPLE}{index+1}{Colour.END}):{Colour.GREEN} {item['user']}{Colour.END}")
+
+        while True:
+            inputted_setting = input(
+                f"Which setting would you like to change (enter the number in purple): {Colour.PURPLE}")
+            print(Colour.END, end="") # Changes the colour so that not everything is purple
+            try:
+                settings_number = int(inputted_setting)
+                if settings_number > len(settings.settings_data) or settings_number < 1:
+                    print(f"{Colour.RED}{settings_number} is not a valid input, please try again{Colour.END}")
+                else:
+                    break
+            except ValueError as e:
+                print(f"{Colour.RED}Invalid Input: Only ints can be entered ({inputted_setting} is not an int){Colour.END}")
+            except Exception as e:
+                print(f"{Colour.RED}Invalid Input: {e}{Colour.END}")
+
+
+        while True:
+            required_type = settings.settings_data[settings_number - 1]["input_type"]
+            inputted_change = input(
+                f"What would you like to update ({settings.settings_data[settings_number - 1]['formatted_name']}) to: {Colour.PURPLE}")
+            print(Colour.END, end="")  # Changes the colour so that not everything is purple
+
+            try:
+                new_value_to_update = required_type(inputted_change)
+                break
+            except ValueError as e:
+                print(f"{Colour.RED}Invalid Input: Only {required_type} can be entered ({inputted_change} is not of type {required_type}){Colour.END}")
+            except Exception as e:
+                print(f"{Colour.RED}Invalid Input: {e}{Colour.END}")
+
+        new_settings = settings.get_settings()
+        #new_settings[settings.settings_data[settings_number]["setting"]] =
+
+
 
     def analyse_teams(self):
         team_list = []
@@ -78,3 +117,16 @@ class command_manager:
                 break
 
         print("Starting analyse")
+
+
+class Colour:
+    PURPLE = '\033[95m'
+    CYAN = '\033[96m'
+    DARKCYAN = '\033[36m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    END = '\033[0m'
