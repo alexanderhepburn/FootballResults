@@ -4,6 +4,7 @@ from data_manager import data_manager
 from network_manager import network_manager
 from tabulate import tabulate
 from settings_manager import settings_manager, InvalidValueError
+import os
 
 class command_manager:
 
@@ -62,7 +63,8 @@ class command_manager:
             print(f"Total Games Error: {e}")
 
     def print_teams(self):
-        print(data_manager.get_all_teams())
+        df = pd.DataFrame(data_manager.get_all_teams(), columns=['Teams'])
+        print(df)
 
     def settings(self):
         settings = settings_manager()
@@ -112,17 +114,31 @@ class command_manager:
 
     def analyse_teams(self):
         team_list = []
+        print(f"{Colour.BLUE}For a list of teams just type: '*teams'{Colour.END}")
         while True:
-            team_input = input(f"Enter team name #{len(team_list) + 1}: ")
-            if team_input in data_manager.get_all_teams():
+            team_input = input(f"{Colour.END}Enter team name {Colour.GREEN}{len(team_list) + 1}{Colour.END}: {Colour.PURPLE}")
+            if team_input == "*teams":
+                self.print_teams()
+            elif team_input == "end":
+                print(f"{Colour.BLUE}Returning to the main menu.{Colour.END}")
+                return
+            elif team_input in data_manager.get_all_teams():
                 team_list.append(team_input)
             else:
-                print("Error please enter a valid team name.")
+                print(f"{Colour.RED}Error please enter a valid team name.{Colour.END}")
 
             if len(team_list) == 2:
+                print(Colour.END, end="")
                 break
 
-        print("Starting analyse")
+        print(f"{Colour.BLUE}Starting analyse...{Colour.END}")
+        file_name = data_manager.analyse_data(team_list[0], team_list[1])
+        print(f"{Colour.GREEN}Success! {Colour.BLUE}Report has been generated in the folder exports. Opening file.{Colour.END}")
+        try:
+            os.system(f"open {file_name}")
+        except Exception as e:
+            print(f"Error opening file: {e}")
+
 
     def update_data(self):
         network_manager.get_all_data()

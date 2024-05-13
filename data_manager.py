@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import json
 from settings_manager import settings_manager
+from fpdf import FPDF
 
 class data_manager:
     @staticmethod
@@ -39,3 +40,17 @@ class data_manager:
             return unique_values_list
         except Exception as e:
             print(f"Teams Error: {e}")
+
+    @staticmethod
+    def analyse_data(team1, team2):
+        pdf = FPDF('P', 'mm', 'A4')
+        pdf.add_page()
+        pdf.set_margins(0, 0, 0)
+
+        pdf.set_font('Arial', 'B', 14)
+        pdf.cell(w=40, h=10, txt=f"{team1} vs {team2}", border=0, ln=1, align='', fill=False, link='')
+
+        file_name = f'exports/{team1}_vs_{team2}.pdf'
+        pdf.output(file_name, 'F')
+        return file_name
+
