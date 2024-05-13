@@ -2,6 +2,9 @@ import pandas as pd
 import requests
 from settings_manager import settings_manager
 import os
+from tqdm import tqdm
+from helper_methods import Colour
+
 
 class network_manager:
 
@@ -22,8 +25,20 @@ class network_manager:
 
     @staticmethod
     def get_all_data():
+        print(f"{Colour.GREEN}Updating data!{Colour.END}")
         settings = settings_manager()
         year_array = [x for x in range(settings.min_start_year, settings.max_end_year)]
-        for league in settings.accepted_leagues:
-            for year in year_array:
-                network_manager.get_data(year, league)
+        total_iterations = len(year_array) * len(settings.accepted_leagues)
+        with tqdm(total=total_iterations) as pbar:
+            for league in settings.accepted_leagues:
+                for year in year_array:
+                    network_manager.get_data(year, league)
+                    pbar.update(1)
+        print(f"{Colour.GREEN}Success! Data has been updated!{Colour.END}")
+
+    @staticmethod
+    def setup():
+        DIR = 'data/E0'
+        if len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]) < 10:
+            print(f"{Colour.BLUE}Data upgrade required.")
+            network_manager.get_all_data()

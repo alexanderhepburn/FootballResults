@@ -1,5 +1,5 @@
 import pandas as pd
-
+from helper_methods import Colour
 from data_manager import data_manager
 from network_manager import network_manager
 from tabulate import tabulate
@@ -9,13 +9,14 @@ class command_manager:
 
     def run_program(self):
         self.__list_of_commands = {"help": {"function" : self.info, "description" : "This function helps you"},
-                                   "gamesplayed": {"function" : self.total_games, "description" : "INPUT DESCR"},
+                                   "end": {"function": None, "description": "Ends the program."},
                                    "teams": {"function" : self.print_teams, "description" : "Print all available teams."},
                                    "settings": {"function" : self.settings, "description" : "Change the current app settings."},
                                    "analyse": {"function" : self.analyse_teams, "description" : "Analyse two teams."},
                                    "update_data": {"function": self.update_data, "description": "Updates all the data."}}
 
-        print(f"Welcome to the FootballResults program!")
+        print(f"{Colour.BLUE}Welcome to the FootballResults program!{Colour.END}")
+        network_manager.setup()
         print(f"For a list of all commands, please type {Colour.GREEN}help{Colour.END}.")
 
         while True:
@@ -24,7 +25,7 @@ class command_manager:
                 print(Colour.END, end="")
 
                 if user_input == "end":
-                    print(f"Thank you for using our program! Bye!")
+                    print(f"{Colour.BLUE}Thank you for using our program! Bye!{Colour.END}")
                     return
 
                 if not user_input in self.__list_of_commands:
@@ -37,13 +38,12 @@ class command_manager:
                 print(f"Error Run Program: {e}")
 
     def info(self):
-        print(f"\nPrinting all of the available commands:")
+        print(f"{Colour.BLUE}Printing all of the available commands:{Colour.END}")
         for method, contents in self.__list_of_commands.items():
             try:
                 print(f"{Colour.GREEN}{method}{Colour.END}: {Colour.PURPLE}{contents['description']}{Colour.END}")
             except KeyError:
                 print(f"{Colour.GREEN}{method}{Colour.END}: {Colour.RED}No description{Colour.END}")
-        print("") # Adding space for readibility
 
     def total_games(self):
         try:
@@ -125,18 +125,4 @@ class command_manager:
         print("Starting analyse")
 
     def update_data(self):
-        print(f"{Colour.GREEN}Updating data!{Colour.END}")
         network_manager.get_all_data()
-
-
-class Colour:
-    PURPLE = '\033[95m'
-    CYAN = '\033[96m'
-    DARKCYAN = '\033[36m'
-    BLUE = '\033[94m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    RED = '\033[91m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-    END = '\033[0m'

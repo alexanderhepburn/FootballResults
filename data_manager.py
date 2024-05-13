@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import json
+from settings_manager import settings_manager
 
 class data_manager:
     @staticmethod
@@ -10,7 +11,8 @@ class data_manager:
 
     @staticmethod
     def get_all_data():
-        directory = os.fsencode("data")
+        current_league = settings_manager().user_league
+        directory = os.fsencode(f"data/{current_league}")
 
         list_of_df = []
 
@@ -20,7 +22,7 @@ class data_manager:
                 print("ERROR Filename CSV")
                 continue
             try:
-                df = pd.read_csv(f"data/{filename}")
+                df = pd.read_csv(f"data/{current_league}/{filename}")
             except Exception as e:
                 print(f"Error with file {filename}: {e}")
             list_of_df.append(df)
