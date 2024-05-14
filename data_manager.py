@@ -61,9 +61,12 @@ class data_manager:
         except Exception as e:
             print(f"Teams Error: {e}")
 
-    @staticmethod
-    def analyse_data(team1, team2):
-        pdf = fpdf('P', 'mm', 'A4')
+    def analyse_data(self, team1, team2):
+        pdf = fpdf('P', 'mm', 'A4') # A4 (210 by 297 mm)
+
+        PHEIGHT = 297
+        PWIDTH = 210
+
         pdf.add_page()
         pdf.set_margins(7, 0, 7)
 
@@ -78,6 +81,8 @@ class data_manager:
         team1_away = total_games_away[total_games_away['AwayTeam'] == team1]
         team2_away = total_games_away[total_games_away['AwayTeam'] == team2]
 
+
+
         # Zwei plots mit den daten
 
         plt.figure(figsize=(10, 6))
@@ -91,7 +96,7 @@ class data_manager:
         plt.xticks(team1_home['Date'])
         plt.grid(axis='y', alpha=0.7)
 
-        plt.savefig('plot.png')
+        plt.savefig('tmp/plot1.png')
 
         plt.figure(figsize=(10, 6))
         # Width of a bar
@@ -104,7 +109,24 @@ class data_manager:
         plt.xticks(team1_away['Date'])
         plt.grid(axis='y', alpha=0.7)
 
-        plt.savefig('plot1.png')
+        plt.savefig('tmp/plot2.png')
+
+        team1_home_df = df[df['HomeTeam'] == team1]
+        team2_home_df = df[df['HomeTeam'] == team2]
+        # Group by year and aggregate points using sum
+        team1_home_by_year = team1_home_df.groupby(team1_home_df['Date'].dt.year)['FTHG'].sum()
+        team2_home_by_year = team2_home_df.groupby(team2_home_df['Date'].dt.year)['FTHG'].sum()
+        self.create_bar(team1_home_by_year.values, team2_home_by_year.values, team1_home_by_year.index, team2_home_by_year.index, team1, team2, 3)
+
+        team1_home_df = df[df['AwayTeam'] == team1]
+        team2_home_df = df[df['AwayTeam'] == team2]
+        # Group by year and aggregate points using sum
+        team1_home_by_year = team1_home_df.groupby(team1_home_df['Date'].dt.year)['FTAG'].sum()
+        team2_home_by_year = team2_home_df.groupby(team2_home_df['Date'].dt.year)['FTAG'].sum()
+        self.create_bar(team1_home_by_year.values, team2_home_by_year.values, team1_home_by_year.index, team2_home_by_year.index, team1, team2, 4)
+
+
+
 
         top_margin = 50
         height = 57
@@ -114,18 +136,34 @@ class data_manager:
         pdf.multi_cell(w=210, h=10, txt=f"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.  Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer",
                  border=0, align='', fill=False)
 
-        pdf.image('plot.png', x=7, y=top_margin, w=100)
-        pdf.image('plot1.png', x=103, y=top_margin, w=100)
+        pdf.image('tmp/plot1.png', x=7, y=top_margin, w=100)
+        pdf.image('tmp/plot2.png', x=103, y=top_margin, w=100)
 
-        pdf.image('plot.png', x=7, y=top_margin+height, w=100)
-        pdf.image('plot1.png', x=103, y=top_margin+height, w=100)
+        pdf.image('tmp/plot3.png', x=7, y=top_margin+height, w=100)
+        pdf.image('tmp/plot4.png', x=103, y=top_margin+height, w=100)
 
-        pdf.image('plot.png', x=7, y=top_margin+height*2, w=100)
-        pdf.image('plot1.png', x=103, y=top_margin+height*2, w=100)
+        pdf.image('tmp/plot.png', x=7, y=top_margin+height*2, w=100)
+        pdf.image('tmp/plot1.png', x=103, y=top_margin+height*2, w=100)
 
-        pdf.image('plot.png', x=7, y=top_margin+height*3, w=100)
-        pdf.image('plot1.png', x=103, y=top_margin+height*3, w=100)
+        pdf.image('tmp/plot.png', x=7, y=top_margin+height*3, w=100)
+        pdf.image('tmp/plot1.png', x=103, y=top_margin+height*3, w=100)
         file_name = f'exports/{team1}_vs_{team2}.pdf'
         pdf.output(file_name, 'F')
         return file_name
+
+    def create_bar(self, x1, x2, y1, y2, x1_name, x2_name, plot_number):
+        plt.figure(figsize=(10, 6))
+        # Width of a bar
+        width = 0.4
+
+        plt.bar(y1 - (width / 2), x1, width=width, color='skyblue',
+                label=x1_name)
+        plt.bar(y2 + (width / 2), x2, width=width, color='purple',
+                label=x2_name)
+        plt.legend(loc="best")
+        plt.title(f'Away Goals per Year')
+        plt.xticks(y1)
+        plt.grid(axis='y', alpha=0.7)
+
+        plt.savefig(f'tmp/plot{plot_number}.png')
 

@@ -116,7 +116,7 @@ class command_manager:
                 break
 
         print(f"{Colour.BLUE}Starting analyse...{Colour.END}")
-        file_name = data_manager.analyse_data(team_list[0], team_list[1])
+        file_name = data_manager().analyse_data(team_list[0], team_list[1])
         print(f"{Colour.GREEN}Success! {Colour.BLUE}Report has been generated in the folder exports. Opening file.{Colour.END}")
         try:
             os.system(f"open {file_name}")
