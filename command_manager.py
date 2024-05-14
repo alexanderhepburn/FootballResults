@@ -46,22 +46,6 @@ class command_manager:
             except KeyError:
                 print(f"{Colour.GREEN}{method}{Colour.END}: {Colour.RED}No description{Colour.END}")
 
-    def total_games(self):
-        try:
-            df = data_manager.get_all_data()
-            while True:
-                team_name = input("Please input team name: ").capitalize()
-                if (team_name in df['HomeTeam'].values) or (team_name in df['AwayTeam'].values):
-                    break
-                print("Error team not found, please try again!")
-
-            print("team found")
-
-            total_number_of_games = ((df['HomeTeam'] == team_name) | (df['AwayTeam'] == team_name)).sum()
-            print(f"Team: {team_name}, has played a total of {total_number_of_games} times!")
-        except Exception as e:
-            print(f"Total Games Error: {e}")
-
     def print_teams(self):
         df = pd.DataFrame(data_manager.get_all_teams(), columns=['Teams'])
         print(df)
