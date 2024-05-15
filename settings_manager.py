@@ -4,7 +4,7 @@ import settings_manager
 
 class settings_manager:
 
-    max_end_year = 2023
+    max_end_year = 2024
     min_start_year = 2010
     accepted_leagues = ["E0", "E1", "D1", "D2"]
 
@@ -33,9 +33,8 @@ class settings_manager:
         json.dump(dictionary_input, save_file)
         save_file.close()
 
-    @staticmethod
-    def reset_settings():
-        settings_manager.update_settings({"league": "E0", "starting_year": 2010, "ending_year": 2023})
+    def reset_settings(self):
+        settings_manager.update_settings({"league": "E0", "starting_year": self.min_start_year, "ending_year": self.max_end_year})
 
 class InvalidValueError(Exception):
     pass

@@ -27,7 +27,7 @@ class network_manager:
     def get_all_data():
         print(f"{Colour.GREEN}Updating data!{Colour.END}")
         settings = settings_manager()
-        year_array = [x for x in range(settings.min_start_year, settings.max_end_year)]
+        year_array = [x for x in range(settings.min_start_year, settings.max_end_year+1)]
         total_iterations = len(year_array) * len(settings.accepted_leagues)
         with tqdm(total=total_iterations) as pbar:
             for league in settings.accepted_leagues:
