@@ -75,8 +75,16 @@ class data_manager:
         try:
             team1_home_df = df[df['HomeTeam'] == team1]
             team1_home_df = team1_home_df.loc[:, columns_to_keep]
-            team1_df = team1_home_df.groupby(team1_home_df['Date'].dt.year).sum()
-            print(team1_df.head())
+            team1h_df = team1_home_df.groupby(team1_home_df['Date'].dt.year).agg({'FTHG': 'sum', 'HTHG': 'sum', 'HST': 'sum', 'HS': 'sum', 'HF': 'sum', 'HC': 'sum'})
+
+            columns_to_keep = ['HomeTeam', 'Date', 'FTAG', 'HTAG', 'AST', 'AS', 'AF', 'AC']
+            team1_away_df = df[df['AwayTeam'] == team1]
+            team1_away_df = team1_away_df.loc[:, columns_to_keep]
+            team1a_df = team1_away_df.groupby(team1_away_df['Date'].dt.year).agg(
+                {'FTAG': 'sum', 'HTAG': 'sum', 'AST': 'sum', 'AS': 'sum', 'AF': 'sum', 'AC': 'sum'})
+
+            ## TODO DAS BENUTZEN
+            print(team1a_df.head())
         except Exception as e:
             print(e)
 
