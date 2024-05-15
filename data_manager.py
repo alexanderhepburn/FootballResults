@@ -8,15 +8,7 @@ from io import BytesIO
 
 class data_manager:
     @staticmethod
-    def get_data_as_df(year):
-        """
-        test_function does blah blah blah.
-
-        :param p1: describe about parameter p1
-        :param p2: describe about parameter p2
-        :param p3: describe about parameter p3
-        :return: describe what it returns
-        """
+    def get_data_as_df(year: int):
         df = pd.read_csv(f"data/{year-1}{year}.csv")
         return df
 
@@ -114,7 +106,7 @@ class data_manager:
                  border=0, align='', fill=False)
 
         for i in range(1, 9):
-            pdf.image(f'tmp/plot{i}.png', x=(i%2)*96+7, y=top_margin+(i//2)*height, w=100)
+            pdf.image(f'tmp/plot{i}.png', x=(0 if i % 2 != 0 else 1)*96+7, y=top_margin+((i-1)//2)*height, w=100)
 
         # pdf.image('tmp/plot1.png', x=7, y=top_margin, w=100)
         # pdf.image('tmp/plot2.png', x=103, y=top_margin, w=100)
@@ -131,7 +123,7 @@ class data_manager:
         pdf.output(file_name, 'F')
         return file_name
 
-    def create_bar(self, x1, x2, y1, y2, x1_name, x2_name, plot_number):
+    def create_bar(self, x1: list, x2: list, y1: list, y2: list, x1_name: str, x2_name: str, plot_number: int):
         plt.figure(figsize=(10, 6))
         # Width of a bar
         width = 0.4
