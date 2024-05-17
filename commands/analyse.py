@@ -1,6 +1,6 @@
 from commands.command import Command
-from data_manager import data_manager
-from command_manager import Colour
+from managers.data_manager import data_manager
+from managers.command_manager import Colour
 import platform
 import os
 

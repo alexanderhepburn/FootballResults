@@ -1,4 +1,4 @@
-from league import League
+from settings.league import League
 import json
 
 
@@ -19,7 +19,7 @@ class Settings:
 
     @classmethod
     def user(cls):
-        with open('settings.json', 'r') as file:
+        with open('settings/settings.json', 'r') as file:
             json_data = json.load(file)
             return cls(json_data["starting_year"], json_data["ending_year"], League[json_data["league"]])
 

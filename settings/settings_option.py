@@ -1,6 +1,6 @@
-from user_settings import UserSettings
-from command_manager import Colour
-from league import League
+from settings.user_settings import UserSettings
+from managers.command_manager import Colour
+from settings.league import League
 
 
 class SettingsOption:

@@ -1,9 +1,9 @@
-import pandas as pd
 import requests
-from settings_manager import SettingsManager
+from settings.settings_manager import SettingsManager
 import os
 from tqdm import tqdm
-from helper_methods import Colour
+from misc.helper_methods import Colour
+from settings.league import League
 
 
 class network_manager:
@@ -12,7 +12,7 @@ class network_manager:
     def get_data(year, league):
         try:
             formatted_year = f"{(year % 100) - 1}{(year % 100)}"
-            url = f"https://www.football-data.co.uk/mmz4281/{formatted_year}/{league}.csv"
+            url = f"https://www.football-data.co.uk/mmz4281/{formatted_year}/{league.name}.csv"
             response = requests.get(url)
 
             os.makedirs(f"data/{league}", exist_ok=True)
@@ -27,10 +27,12 @@ class network_manager:
     def get_all_data():
         print(f"{Colour.GREEN}Updating data!{Colour.END}")
         settings = SettingsManager()
-        year_array = [x for x in range(settings.min_starting_year, settings.max_ending_year + 1)]
-        total_iterations = len(year_array) * len(settings.accepted_leagues)
+        accepted_leagues = [league for league in League]
+        # TODO Uodate
+        year_array = [x for x in range(2010, 2025)]
+        total_iterations = len(year_array) * len(accepted_leagues)
         with tqdm(total=total_iterations) as pbar:
-            for league in settings.accepted_leagues:
+            for league in accepted_leagues:
                 for year in year_array:
                     network_manager.get_data(year, league)
                     pbar.update(1)
@@ -38,7 +40,8 @@ class network_manager:
 
     @staticmethod
     def setup():
-        DIR = 'data/E0'
-        if not os.path.isdir('data'):
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        parent_directory = os.path.dirname(current_directory)
+        if not os.path.isdir(f'{parent_directory}/data'):
             print(f"{Colour.BLUE}Data upgrade required.")
             network_manager.get_all_data()

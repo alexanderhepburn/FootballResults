@@ -1,8 +1,8 @@
 import json
-from league import League
-from settings import Settings
-from user_settings import UserSettings
-from settings_option import RangeSettingsOption, ListSettingsOption, SettingsOption
+from settings.league import League
+from settings.settings import Settings
+from settings.user_settings import UserSettings
+from settings.settings_option import RangeSettingsOption, ListSettingsOption, SettingsOption
 
 
 class SettingsManager:

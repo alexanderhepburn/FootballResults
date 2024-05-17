@@ -1,4 +1,4 @@
-from settings import Settings
+from settings.settings import Settings
 import json
 
 
@@ -14,7 +14,7 @@ class UserSettings:
     @staticmethod
     def update_value(name, new_value):
         setattr(UserSettings.get_instance(), name, new_value)
-        save_file = open("settings.json", "w")
+        save_file = open("settings/settings.json", "w")
         json.dump(UserSettings.get_instance().to_dict(), save_file)
         save_file.close()
 

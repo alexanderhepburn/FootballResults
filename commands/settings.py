@@ -1,9 +1,9 @@
 from commands.command import Command
-from command_manager import Colour
-from settings_manager import SettingsManager
-from settings_option import SettingsOption
-from user_settings import UserSettings
-from league import League
+from managers.command_manager import Colour
+from settings.settings_manager import SettingsManager
+from settings.settings_option import SettingsOption
+from settings.user_settings import UserSettings
+from settings.league import League
 
 
 class Settings(Command):

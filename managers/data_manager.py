@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from fpdf import FPDF as fpdf
 
-from settings_manager import SettingsManager
+from settings.settings_manager import SettingsManager
 
 
 class data_manager:

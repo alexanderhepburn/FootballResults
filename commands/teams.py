@@ -1,6 +1,6 @@
 from commands.command import Command
 import pandas as pd
-from data_manager import data_manager
+from managers.data_manager import data_manager
 
 
 class Teams(Command):

@@ -7,6 +7,6 @@ if __name__ == '__main__':
                           stderr=subprocess.DEVNULL)
     os.makedirs("tmp", exist_ok=True)
     os.makedirs("exports", exist_ok=True)
-    from command_manager import CommandManager
+    from managers.command_manager import CommandManager
 
     CommandManager.run_program()

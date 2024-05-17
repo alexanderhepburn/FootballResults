@@ -1,5 +1,5 @@
-from helper_methods import Colour
-from network_manager import network_manager
+from misc.helper_methods import Colour
+from managers.network_manager import network_manager
 from commands.commands import Commands
 
 

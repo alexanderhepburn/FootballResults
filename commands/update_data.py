@@ -1,5 +1,5 @@
 from commands.command import Command
-from network_manager import network_manager
+from managers.network_manager import network_manager
 
 
 class UpdateData(Command):
