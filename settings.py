@@ -9,6 +9,10 @@ class Settings:
         self.ending_year = ending_year
         self.league = league
 
+    ## TODO DELTE NACH VERWENDUNG
+    def __str__(self):
+        return f"Starting Year: {self.starting_year}, Ending: {self.ending_year}, League: {self.league}"
+
     @classmethod
     def default(cls):
         return cls(2010, 2024, League.E0)

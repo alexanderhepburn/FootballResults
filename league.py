@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, EnumMeta
 
 
 class League(Enum):
@@ -9,3 +9,10 @@ class League(Enum):
 
     def __str__(self):
         return self.value
+
+    @classmethod
+    def from_string(cls, value):
+        for league in cls:
+            if league.name == value:
+                return league
+        raise ValueError(f"No such league: {value}")

@@ -1,10 +1,10 @@
-import pandas as pd
 import os
-import json
-from settings_manager import SettingsManager
-from fpdf import FPDF as fpdf
+
 import matplotlib.pyplot as plt
-from io import BytesIO
+import pandas as pd
+from fpdf import FPDF as fpdf
+
+from settings_manager import SettingsManager
 
 
 class data_manager:
@@ -58,7 +58,7 @@ class data_manager:
         except Exception as e:
             print(f"Teams Error: {e}")
 
-    def analyse_data(self, team1: str, team2: str) -> None:
+    def analyse_data(self, team1: str, team2: str) -> str:
         pdf = fpdf('P', 'mm', 'A4')  # A4 (210 by 297 mm)
 
         PHEIGHT = 297
@@ -116,6 +116,21 @@ class data_manager:
         # Group by year and aggregate points using sum
         team1_home_by_year = team1_home_df.groupby(team1_home_df['Date'].dt.year)['FTAG'].sum()
         team2_home_by_year = team2_home_df.groupby(team2_home_df['Date'].dt.year)['FTAG'].sum()
+        # TODO: Threading
+
+        # event = threading.Event()
+        # for i in range(4, 9):
+        #     def f1():
+        #         self.create_bar(team1_home_by_year.values, team2_home_by_year.values, team1_home_by_year.index,
+        #                         team2_home_by_year.index, team1, team2, i, "Home Goals per Year")
+        #         if i == 8:
+        #             event.set()
+        #
+        #     thread = threading.Thread(target=f1)
+        #     thread.start()
+        #     print("Starting ", i)
+        #
+        # event.wait()
         self.create_bar(team1_home_by_year.values, team2_home_by_year.values, team1_home_by_year.index,
                         team2_home_by_year.index, team1, team2, 4, "Home Goals per Year")
         self.create_bar(team1_home_by_year.values, team2_home_by_year.values, team1_home_by_year.index,
