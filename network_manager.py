@@ -1,6 +1,6 @@
 import pandas as pd
 import requests
-from settings_manager import settings_manager
+from settings_manager import SettingsManager
 import os
 from tqdm import tqdm
 from helper_methods import Colour
@@ -11,7 +11,7 @@ class network_manager:
     @staticmethod
     def get_data(year, league):
         try:
-            formatted_year = f"{(year % 100)-1}{(year % 100)}"
+            formatted_year = f"{(year % 100) - 1}{(year % 100)}"
             url = f"https://www.football-data.co.uk/mmz4281/{formatted_year}/{league}.csv"
             response = requests.get(url)
 
@@ -26,8 +26,8 @@ class network_manager:
     @staticmethod
     def get_all_data():
         print(f"{Colour.GREEN}Updating data!{Colour.END}")
-        settings = settings_manager()
-        year_array = [x for x in range(settings.min_start_year, settings.max_end_year+1)]
+        settings = SettingsManager()
+        year_array = [x for x in range(settings.min_start_year, settings.max_end_year + 1)]
         total_iterations = len(year_array) * len(settings.accepted_leagues)
         with tqdm(total=total_iterations) as pbar:
             for league in settings.accepted_leagues:

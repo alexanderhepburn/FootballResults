@@ -1,22 +1,21 @@
 import pandas as pd
 import os
 import json
-from settings_manager import settings_manager
+from settings_manager import SettingsManager
 from fpdf import FPDF as fpdf
 import matplotlib.pyplot as plt
 from io import BytesIO
 
+
 class data_manager:
     @staticmethod
     def get_data_as_df(year: int):
-        df = pd.read_csv(f"data/{year-1}{year}.csv")
+        df = pd.read_csv(f"data/{year - 1}{year}.csv")
         return df
 
     @staticmethod
     def get_all_data():
-        s = settings_manager()
-        current_league = s.user_league
-        directory = os.fsencode(f"data/{current_league}")
+        directory = os.fsencode(f"data/{SettingsManager.user_settings.league.name}")
 
         list_of_df = []
 
@@ -26,7 +25,7 @@ class data_manager:
                 print("ERROR Filename CSV")
                 continue
             try:
-                df = pd.read_csv(f"data/{current_league}/{filename}")
+                df = pd.read_csv(f"data/{SettingsManager.user_settings.league.name}/{filename}")
             except Exception as e:
                 print(f"Error with file {filename}: {e}")
             list_of_df.append(df)
@@ -42,7 +41,9 @@ class data_manager:
 
         combined_df['Date'] = combined_df['Date'].apply(custom_date_parser)
 
-        filtered_df = combined_df[(combined_df['Date'].dt.year >= s.user_start_year) & (combined_df['Date'].dt.year <= s.user_end_year)]
+        filtered_df = combined_df[
+            (combined_df['Date'].dt.year >= SettingsManager.user_settings.starting_year) & (
+                    combined_df['Date'].dt.year <= SettingsManager.user_settings.ending_year)]
 
         return filtered_df
 
@@ -57,8 +58,8 @@ class data_manager:
         except Exception as e:
             print(f"Teams Error: {e}")
 
-    def analyse_data(self, team1, team2):
-        pdf = fpdf('P', 'mm', 'A4') # A4 (210 by 297 mm)
+    def analyse_data(self, team1: str, team2: str) -> None:
+        pdf = fpdf('P', 'mm', 'A4')  # A4 (210 by 297 mm)
 
         PHEIGHT = 297
         PWIDTH = 210
@@ -75,7 +76,8 @@ class data_manager:
         try:
             team1_home_df = df[df['HomeTeam'] == team1]
             team1_home_df = team1_home_df.loc[:, columns_to_keep]
-            team1h_df = team1_home_df.groupby(team1_home_df['Date'].dt.year).agg({'FTHG': 'sum', 'HTHG': 'sum', 'HST': 'sum', 'HS': 'sum', 'HF': 'sum', 'HC': 'sum'})
+            team1h_df = team1_home_df.groupby(team1_home_df['Date'].dt.year).agg(
+                {'FTHG': 'sum', 'HTHG': 'sum', 'HST': 'sum', 'HS': 'sum', 'HF': 'sum', 'HC': 'sum'})
 
             columns_to_keep = ['HomeTeam', 'Date', 'FTAG', 'HTAG', 'AST', 'AS', 'AF', 'AC']
             team1_away_df = df[df['AwayTeam'] == team1]
@@ -88,7 +90,6 @@ class data_manager:
         except Exception as e:
             print(e)
 
-
         total_games_home = df.groupby([df['Date'].dt.year, 'HomeTeam']).size().reset_index(name='Count')
         team1_home = total_games_home[total_games_home['HomeTeam'] == team1]
         team2_home = total_games_home[total_games_home['HomeTeam'] == team2]
@@ -98,27 +99,33 @@ class data_manager:
         team2_away = total_games_away[total_games_away['AwayTeam'] == team2]
 
         self.create_bar(team1_home['Count'], team2_home['Count'], team1_home['Date'],
-                        team2_home['Date'], team1, team2, 1,  "Home Matches per Year")
+                        team2_home['Date'], team1, team2, 1, "Home Matches per Year")
         self.create_bar(team1_away['Count'], team2_away['Count'], team1_away['Date'],
-                        team2_away['Date'], team1, team2, 2,  "Away Matches per Year")
+                        team2_away['Date'], team1, team2, 2, "Away Matches per Year")
 
         team1_home_df = df[df['HomeTeam'] == team1]
         team2_home_df = df[df['HomeTeam'] == team2]
         # Group by year and aggregate points using sum
         team1_home_by_year = team1_home_df.groupby(team1_home_df['Date'].dt.year)['FTHG'].sum()
         team2_home_by_year = team2_home_df.groupby(team2_home_df['Date'].dt.year)['FTHG'].sum()
-        self.create_bar(team1_home_by_year.values, team2_home_by_year.values, team1_home_by_year.index, team2_home_by_year.index, team1, team2, 3,  "Away Goals per Year")
+        self.create_bar(team1_home_by_year.values, team2_home_by_year.values, team1_home_by_year.index,
+                        team2_home_by_year.index, team1, team2, 3, "Away Goals per Year")
 
         team1_home_df = df[df['AwayTeam'] == team1]
         team2_home_df = df[df['AwayTeam'] == team2]
         # Group by year and aggregate points using sum
         team1_home_by_year = team1_home_df.groupby(team1_home_df['Date'].dt.year)['FTAG'].sum()
         team2_home_by_year = team2_home_df.groupby(team2_home_df['Date'].dt.year)['FTAG'].sum()
-        self.create_bar(team1_home_by_year.values, team2_home_by_year.values, team1_home_by_year.index, team2_home_by_year.index, team1, team2, 4, "Home Goals per Year")
-        self.create_bar(team1_home_by_year.values, team2_home_by_year.values, team1_home_by_year.index, team2_home_by_year.index, team1, team2, 5, "Away Goals per Year")
-        self.create_bar(team1_home_by_year.values, team2_home_by_year.values, team1_home_by_year.index, team2_home_by_year.index, team1, team2, 6, "Away Goals per Year")
-        self.create_bar(team1_home_by_year.values, team2_home_by_year.values, team1_home_by_year.index, team2_home_by_year.index, team1, team2, 7, "Away Goals per Year")
-        self.create_bar(team1_home_by_year.values, team2_home_by_year.values, team1_home_by_year.index, team2_home_by_year.index, team1, team2, 8, "Away Goals per Year")
+        self.create_bar(team1_home_by_year.values, team2_home_by_year.values, team1_home_by_year.index,
+                        team2_home_by_year.index, team1, team2, 4, "Home Goals per Year")
+        self.create_bar(team1_home_by_year.values, team2_home_by_year.values, team1_home_by_year.index,
+                        team2_home_by_year.index, team1, team2, 5, "Away Goals per Year")
+        self.create_bar(team1_home_by_year.values, team2_home_by_year.values, team1_home_by_year.index,
+                        team2_home_by_year.index, team1, team2, 6, "Away Goals per Year")
+        self.create_bar(team1_home_by_year.values, team2_home_by_year.values, team1_home_by_year.index,
+                        team2_home_by_year.index, team1, team2, 7, "Away Goals per Year")
+        self.create_bar(team1_home_by_year.values, team2_home_by_year.values, team1_home_by_year.index,
+                        team2_home_by_year.index, team1, team2, 8, "Away Goals per Year")
 
         ## Shots on Target
         ## Corner, Fouls, Free kicks
@@ -128,17 +135,21 @@ class data_manager:
         # Set the position
         pdf.set_x(title_x)
 
-        pdf.cell(w=40, h=10, txt=f"{team1} vs {team2} Performance Report ({settings_manager().user_start_year}-{settings_manager().user_end_year})", border=0, ln=1, align='', fill=False, link='')
+        pdf.cell(w=40, h=10,
+                 txt=f"{team1} vs {team2} Performance Report ({SettingsManager.user_settings.starting_year}-{SettingsManager.user_settings.ending_year})",
+                 border=0, ln=1, align='', fill=False, link='')
         pdf.set_font('Arial', '', 10)
-        pdf.multi_cell(w=PWIDTH-2*margin_side, h=5, txt=f"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
-                 border=0, align='J', fill=False)
+        pdf.multi_cell(w=PWIDTH - 2 * margin_side, h=5,
+                       txt=f"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
+                       border=0, align='J', fill=False)
 
         top_margin = 60
         height = 57
 
         for i in range(1, 9):
             try:
-                pdf.image(f'tmp/plot{i}.png', x=(0 if i % 2 != 0 else 1)*96+7, y=top_margin+((i-1)//2)*height, w=100)
+                pdf.image(f'tmp/plot{i}.png', x=(0 if i % 2 != 0 else 1) * 96 + 7,
+                          y=top_margin + ((i - 1) // 2) * height, w=100)
             except Exception as e:
                 print(f"Error with image generation: {e}")
 
@@ -146,7 +157,8 @@ class data_manager:
         pdf.output(file_name, 'F')
         return file_name
 
-    def create_bar(self, x1: list, x2: list, y1: list, y2: list, x1_name: str, x2_name: str, plot_number: int, title: str):
+    def create_bar(self, x1: list, x2: list, y1: list, y2: list, x1_name: str, x2_name: str, plot_number: int,
+                   title: str):
         plt.figure(figsize=(10, 6))
         # Width of a bar
         width = 0.4
@@ -161,4 +173,3 @@ class data_manager:
         plt.grid(axis='y', alpha=0.7)
 
         plt.savefig(f'tmp/plot{plot_number}.png')
-

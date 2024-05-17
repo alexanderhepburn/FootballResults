@@ -3,18 +3,25 @@ from helper_methods import Colour
 from data_manager import data_manager
 from network_manager import network_manager
 from tabulate import tabulate
-from settings_manager import settings_manager, InvalidValueError
+from league import League
+import platform
+
+from settings import Settings
+from settings_manager import SettingsManager, InvalidValueError
 import os
+
 
 class command_manager:
 
     def run_program(self):
-        self.__list_of_commands = {"help": {"function" : self.info, "description" : "This function helps you"},
+        self.__list_of_commands = {"help": {"function": self.info, "description": "This function helps you"},
                                    "end": {"function": None, "description": "Ends the program."},
-                                   "teams": {"function" : self.print_teams, "description" : "Print all available teams."},
-                                   "settings": {"function" : self.settings, "description" : "Change the current app settings."},
-                                   "analyse": {"function" : self.analyse_teams, "description" : "Analyse two teams."},
-                                   "update_data": {"function": self.update_data, "description": "Updates all the data."}}
+                                   "teams": {"function": self.print_teams, "description": "Print all available teams."},
+                                   "settings": {"function": self.settings,
+                                                "description": "Change the current app settings."},
+                                   "analyse": {"function": self.analyse_teams, "description": "Analyse two teams."},
+                                   "update_data": {"function": self.update_data,
+                                                   "description": "Updates all the data."}}
 
         print(f"{Colour.BLUE}Welcome to the FootballResults program!{Colour.END}")
         network_manager.setup()
@@ -31,7 +38,8 @@ class command_manager:
 
                 if not user_input in self.__list_of_commands:
                     print(f"Error your command: {user_input} is not a valid input!")
-                    print(f"Please reenter your command or type {Colour.GREEN}help{Colour.END} for a directory of all commands.")
+                    print(
+                        f"Please reenter your command or type {Colour.GREEN}help{Colour.END} for a directory of all commands.")
                     continue
 
                 self.__list_of_commands[user_input]["function"]()
@@ -51,56 +59,65 @@ class command_manager:
         print(df)
 
     def settings(self):
-        settings = settings_manager()
+        SettingsManager.refresh_settings()
         print("Here are your current settings:")
 
-        for index, item in enumerate(settings.settings_data):
-            print(f"{item['formatted_name']} ({Colour.PURPLE}{index+1}{Colour.END}):{Colour.GREEN} {item['user']}{Colour.END}")
+        for index, item in enumerate(SettingsManager.settings_data):
+            print(
+                f"{item['formatted_name']} ({Colour.PURPLE}{index + 1}{Colour.END}):{Colour.GREEN} {item['user']}{Colour.END}")
 
         while True:
             inputted_setting = input(
                 f"Which setting would you like to change (enter the number in purple): {Colour.PURPLE}")
-            print(Colour.END, end="") # Changes the colour so that not everything is purple
+            print(Colour.END, end="")  # Changes the colour so that not everything is purple
             try:
                 settings_number = int(inputted_setting)
-                if settings_number > len(settings.settings_data) or settings_number < 1:
+                if settings_number > len(SettingsManager.settings_data) or settings_number < 1:
                     print(f"{Colour.RED}{settings_number} is not a valid input, please try again{Colour.END}")
                 else:
                     break
             except ValueError as e:
-                print(f"{Colour.RED}Invalid Input: Only ints can be entered ({inputted_setting} is not an int){Colour.END}")
+                print(
+                    f"{Colour.RED}Invalid Input: Only ints can be entered ({inputted_setting} is not an int){Colour.END}")
             except Exception as e:
                 print(f"{Colour.RED}Invalid Input: {e}{Colour.END}")
 
-
         while True:
-            required_type = settings.settings_data[settings_number - 1]["input_type"]
+            required_type = SettingsManager.settings_data[settings_number - 1]["input_type"]
+            if settings_number == 3:
+                print(f"Following Team Options (please enter the {Colour.PURPLE}two digit combination{Colour.END}):")
+                for league in League:
+                    print(f"{Colour.BLUE}{league.value}{Colour.END}: {Colour.PURPLE}{league.name}{Colour.END}")
             inputted_change = input(
-                f"What would you like to update ({settings.settings_data[settings_number - 1]['formatted_name']}) to: {Colour.PURPLE}")
+                f"What would you like to update ({SettingsManager.settings_data[settings_number - 1]['formatted_name']}) to: {Colour.PURPLE}")
             print(Colour.END, end="")  # Changes the colour so that not everything is purple
 
             try:
                 new_value_to_update = required_type(inputted_change)
-                new_settings = settings.get_settings()
-                new_settings[settings.settings_data[settings_number - 1]["setting"]] = new_value_to_update
-                settings_manager().update_settings(new_settings)
-                print(f"{Colour.GREEN}Success! {settings.settings_data[settings_number - 1]['formatted_name']} as been updated to: {Colour.PURPLE}{new_value_to_update}{Colour.END}")
+                if settings_number == 3:
+                    new_value_to_update = League[inputted_change]
+                new_settings: Settings = Settings.user()
+                new_settings.update_attribute(SettingsManager.settings_data[settings_number - 1]["setting"],
+                                              new_value_to_update)
+                SettingsManager().update_settings(new_settings)
+                print(
+                    f"{Colour.GREEN}Success! {SettingsManager.settings_data[settings_number - 1]['formatted_name']} as been updated to: {Colour.PURPLE}{new_value_to_update}{Colour.END}")
                 break
             except ValueError as e:
-                print(f"{Colour.RED}Invalid Input: Only {required_type} can be entered ({inputted_change} is not of type {required_type}){Colour.END}")
+                print(
+                    f"{Colour.RED}Invalid Input: Only {required_type} can be entered ({inputted_change} is not of type {required_type}){Colour.END}")
             except InvalidValueError as e:
-                print(f"{Colour.RED}Invalid Input ({new_value_to_update}): accepted are {settings.settings_data[settings_number - 1]['accepted_inputs']}{Colour.END}")
-            except Exception as e:
-                print(f"{Colour.RED}Invalid Input: {e}{Colour.END}")
-
-
-
+                print(
+                    f"{Colour.RED}Invalid Input ({new_value_to_update}): accepted are {SettingsManager.settings_data[settings_number - 1]['accepted_inputs']}{Colour.END}")
+            # except Exception as e:
+            #   print(f"{Colour.RED}Invalid Input: {e}{Colour.END}")
 
     def analyse_teams(self):
         team_list = []
         print(f"{Colour.BLUE}For a list of teams just type: '*teams'{Colour.END}")
         while True:
-            team_input = input(f"{Colour.END}Enter team name {Colour.GREEN}{len(team_list) + 1}{Colour.END}: {Colour.PURPLE}")
+            team_input = input(
+                f"{Colour.END}Enter team name {Colour.GREEN}{len(team_list) + 1}{Colour.END}: {Colour.PURPLE}")
             if team_input == "*teams":
                 self.print_teams()
             elif team_input == "end":
@@ -116,13 +133,21 @@ class command_manager:
                 break
 
         print(f"{Colour.BLUE}Starting analyse...{Colour.END}")
-        file_name = data_manager().analyse_data(team_list[0], team_list[1])
-        print(f"{Colour.GREEN}Success! {Colour.BLUE}Report has been generated in the folder exports. Opening file.{Colour.END}")
-        try:
-            os.system(f"open {file_name}")
-        except Exception as e:
-            print(f"Error opening file: {e}")
+        file_name: str = data_manager().analyse_data(team_list[0], team_list[1])
+        print(
+            f"{Colour.GREEN}Success! {Colour.BLUE}Report has been generated in the folder exports. Opening file.{Colour.END}")
 
+        os_name = platform.system()
+
+        # Open the file based on the operating system
+        if os_name == 'Windows':
+            os.startfile(file_name)
+        elif os_name == 'Darwin':  # macOS
+            os.system('open ' + file_name)
+        elif os_name == 'Linux':
+            os.system('xdg-open ' + file_name)
+        else:
+            print(f"Error opening file, please open it manually!")
 
     def update_data(self):
         network_manager.get_all_data()
