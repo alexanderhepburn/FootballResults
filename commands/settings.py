@@ -1,5 +1,5 @@
 from commands.command import Command
-from managers.command_manager import Colour
+from misc.helper_methods import Colour
 from settings.settings_manager import SettingsManager
 from settings.settings_option import SettingsOption
 from settings.user_settings import UserSettings
