@@ -1,7 +1,7 @@
 from commands.command import Command
-from managers.network_manager import network_manager
+from managers.network_manager import NetworkManager
 
 
 class UpdateData(Command):
     def execute(self):
-        network_manager.get_all_data()
+        NetworkManager.get_all_data()

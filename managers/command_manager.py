@@ -1,13 +1,13 @@
-from misc.helper_methods import Colour
-from managers.network_manager import network_manager
 from commands.commands import Commands
+from managers.network_manager import NetworkManager
+from misc.helper_methods import Colour
 
 
 class CommandManager:
     @staticmethod
     def run_program():
         print(f"{Colour.BLUE}Welcome to the FootballResults program!{Colour.END}")
-        network_manager.setup()
+        NetworkManager.setup()
         print(f"For a list of all commands, please type {Colour.GREEN}help{Colour.END}.")
 
         while True:
