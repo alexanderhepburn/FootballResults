@@ -17,6 +17,10 @@ class Analyse(Command):
             teams = get_all_teams()
             team_input = input(
                 f"{END}Enter team name {GREEN}{len(team_list) + 1}{END}: {PURPLE}").lower()
+            if len(team_list) != 0:
+                if team_input.lower() == team_list[0].lower():
+                    print(f"{RED}Error, please do not enter the same team 2 times!{END}")
+                    continue
             if team_input == "*teams":  # If user requests team list
                 df = pd.DataFrame(teams, columns=['Teams'])
                 print(df)
