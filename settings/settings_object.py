@@ -2,7 +2,7 @@ from settings.league import League
 import json
 
 
-class Settings:
+class SettingsObject:
     """
     A class representing user settings for managing starting year, ending year, and league.
 

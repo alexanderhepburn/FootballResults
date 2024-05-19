@@ -1,23 +1,37 @@
-from analyse.pdf_creator import PdfCreator as creator
+from analyse.pdf_creator import create_pdf
 from analyse.plot import Plot as p
-from managers.data_manager import DataManager  #
+from .data_manager import get_data_with_columns
+from .text_generator import generate_text
 
 
-class Analyse:
+def analyse(team1: str, team2: str) -> str:
+    """
+    Analyzes the performance data of two teams and generates a PDF report.
 
-    def __init__(self, team1: str, team2: str):
-        team_data = DataManager.get_data_with_columns([team1, team2])
+    Args:
+        team1 (str): Name of the first team.
+        team2 (str): Name of the second team.
 
-        p(team_data, team1, team2,
-          ['Full Time Goals', 'Half Time Goals', 'Shots on Target', 'Shots',
-           'Fouls Committed',
-           'Corners', 'Yellow Cards', 'Red Cards'])
+    Returns:
+        str: File name of the generated PDF.
+    """
+    # Retrieve data for the specified teams with the necessary columns
+    team_data = get_data_with_columns([team1, team2])
 
-        pdf_name = creator().create(team1, team2)
-        self._file_name = pdf_name
+    # Plot the performance data for the specified metrics
+    p(team_data, team1, team2, [
+        'Full Time Goals',
+        'Half Time Goals',
+        'Shots on Target',
+        'Shots',
+        'Fouls Committed',
+        'Corners',
+        'Yellow Cards',
+        'Red Cards'
+    ])
 
-    def get_file_name(self) -> str:
-        try:
-            return self._file_name
-        except NameError:
-            raise FileExistsError("Error with the creation of the file.")
+    # Generate the PDF report
+    pdf_name = create_pdf(team1, team2, generate_text(team_data, team1, team2))
+
+    # Return the file name of the generated PDF
+    return pdf_name

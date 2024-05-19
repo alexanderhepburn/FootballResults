@@ -1,6 +1,6 @@
 import json
 from settings.league import League
-from settings.settings import Settings
+from settings.settings_object import SettingsObject
 from settings.user_settings import UserSettings
 from settings.settings_option import RangeSettingsOption, ListSettingsOption, SettingsOption
 
@@ -15,7 +15,7 @@ class SettingsManager:
     """
 
     # Get the instance of user settings
-    user_settings: Settings = UserSettings.get_instance()
+    user_settings: SettingsObject = UserSettings.get_instance()
 
     # Define settings data with default values
     settings_data: SettingsOption = [
@@ -28,8 +28,8 @@ class SettingsManager:
         """
         Resets the settings to their default values.
         """
-        SettingsManager.update_settings(Settings.default().to_dict())
-        UserSettings.update_settings(Settings.default())
+        SettingsManager.update_settings(SettingsObject.default().to_dict())
+        UserSettings.update_settings(SettingsObject.default())
 
     @classmethod
     def refresh_settings(cls):
@@ -38,7 +38,7 @@ class SettingsManager:
 
         This method updates the settings data with the current values from the user settings.
         """
-        user: Settings = UserSettings.get_instance()
+        user: SettingsObject = UserSettings.get_instance()
         cls.user_settings = user
         cls.settings_data[0]["user"] = user.starting_year
         cls.settings_data[1]["user"] = user.ending_year

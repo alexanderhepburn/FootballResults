@@ -1,11 +1,12 @@
-from commands.analyse import Analyse
-from commands.teams import Teams
-from commands.update_data import UpdateData
-from commands.settings import Settings
+from .analyse import Analyse
+from .teams import Teams
+from .update_data import UpdateData
+from .settings import Settings
+from .command import Command
 
 
-class Commands:
-    commands = [Analyse("analyse", "Analyse two teams."),
-                Teams("teams", "TO DO"),
-                UpdateData("update_data", "TO DO"),
-                Settings("settings", "TO DO")]
+def get_commands() -> list[Command]:
+    return [Analyse("analyse", "Analyse two teams."),
+            Teams("teams", "TO DO"),
+            UpdateData("update_data", "TO DO"),
+            Settings("settings", "TO DO")]

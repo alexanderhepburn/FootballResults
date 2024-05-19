@@ -1,5 +1,5 @@
 from settings.user_settings import UserSettings
-from managers.command_manager import Colour
+from misc import *
 from settings.league import League
 
 
@@ -116,6 +116,6 @@ class ListSettingsOption(SettingsOption):
         Returns:
             None
         """
-        print(f"Following Team Options (please enter the {Colour.PURPLE}two digit combination{Colour.END}):")
+        print(f"Following Team Options (please enter the {PURPLE}two digit combination{END}):")
         for league in League:
-            print(f"{Colour.BLUE}{league.value}{Colour.END}: {Colour.PURPLE}{league.name}{Colour.END}")
+            print(f"{BLUE}{league.value}{END}: {PURPLE}{league.name}{END}")

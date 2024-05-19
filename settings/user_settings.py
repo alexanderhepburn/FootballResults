@@ -1,6 +1,6 @@
 import json
 
-from settings.settings import Settings
+from settings.settings_object import SettingsObject
 
 
 class UserSettings:
@@ -11,7 +11,7 @@ class UserSettings:
     and initialize the singleton instance.
     """
 
-    __instance = Settings.user()
+    __instance = SettingsObject.user()
 
     def __init__(self, settings):
         """
@@ -33,7 +33,7 @@ class UserSettings:
             UserSettings: The current singleton instance of UserSettings.
         """
         if UserSettings.__instance == None:
-            UserSettings(Settings.user())
+            UserSettings(SettingsObject.user())
         return UserSettings.__instance
 
     @staticmethod
