@@ -1,36 +1,50 @@
-import misc.colour as c
+from misc import *
 from commands.command import Command
 from settings import *
 
 
 class Settings(Command):
+    """
+    Command to display and update user settings.
+    """
+
     def execute(self):
+        """
+        Executes the settings command, allowing users to view and update their settings.
+        """
+        # Display current settings
         print("Here are your current settings:")
         for index, option in enumerate(SettingsManager.settings_data):
             print(
-                f"{option} ({c.PURPLE}{index + 1}{c.END}):{c.GREEN} {getattr(UserSettings.get_instance(), option.name)}{c.END}")
+                f"{option} ({PURPLE}{index + 1}{END}):{GREEN} {getattr(UserSettings.get_instance(), option.name)}{END}"
+            )
 
+        # Prompt user to select which setting to change
         while True:
             inputted_setting = input(
-                f"Which setting would you like to change (enter the number in purple): {c.PURPLE}")
-            print(c.END, end="")  # Changes the colour so that not everything is purple
+                f"Which setting would you like to change (enter the number in purple): {PURPLE}"
+            ).strip()  # Strip any leading/trailing whitespace
+            print(END, end="")  # Reset color formatting
             try:
                 settings_number = int(inputted_setting)
-                if settings_number > len(SettingsManager.settings_data) or settings_number < 1:
-                    print(f"{c.RED}{settings_number} is not a valid input, please try again{c.END}")
-                else:
+                if 1 <= settings_number <= len(SettingsManager.settings_data):
                     break
-            except ValueError as e:
+                else:
+                    print(f"{RED}{settings_number} is not a valid input, please try again{END}")
+            except ValueError:
                 print(
-                    f"{c.RED}Invalid Input: Only ints can be entered ({inputted_setting} is not an int){c.END}")
+                    f"{RED}Invalid Input: Only ints can be entered ({inputted_setting} is not an int){END}"
+                )
 
+        # Prompt user to enter new value for the selected setting
         while True:
             settings_object: SettingsOption = SettingsManager.settings_data[settings_number - 1]
-            settings_object.extra_info()
+            settings_object.extra_info()  # Display extra info for the setting if available
 
             inputted_change = input(
-                f"What would you like to update ({settings_object}) to: {c.PURPLE}")
-            print(c.END, end="")  # Changes the colour so that not everything is purple
+                f"What would you like to update ({settings_object}) to: {PURPLE}"
+            ).strip()  # Strip any leading/trailing whitespace
+            print(END, end="")  # Reset color formatting
 
             try:
                 if settings_object.input_type == League:
@@ -38,14 +52,16 @@ class Settings(Command):
                 else:
                     new_value = int(inputted_change)
 
-                settings_object.test(new_value)
-                UserSettings.update_value(settings_object.name, new_value)
+                settings_object.test(new_value)  # Validate the new value
+                UserSettings.update_value(settings_object.name, new_value)  # Update the setting
 
                 print(
-                    f"{c.GREEN}Success! {settings_object} as been updated to: {c.PURPLE}{inputted_change}{c.END}")
+                    f"{GREEN}Success! {settings_object} has been updated to: {PURPLE}{inputted_change}{END}"
+                )
                 break
-            except IndexError as e:
-                print(f"{c.RED}Error: {settings_object.get_error(new_value)}{c.END}")
-            except ValueError as e:
+            except IndexError:
+                print(f"{RED}Error: {settings_object.get_error(new_value)}{END}")
+            except ValueError:
                 print(
-                    f"{c.RED}Invalid Input: Only {settings_object.input_type} can be entered ({inputted_change} is not of type {settings_object.input_type}){c.END}")
+                    f"{RED}Invalid Input: Only {settings_object.input_type} can be entered ({inputted_change} is not of type {settings_object.input_type}){END}"
+                )
