@@ -60,24 +60,27 @@ class DataManager:
     def get_data_with_columns(teams: [str]) -> pd.DataFrame:
         try:
             df = DataManager.get_all_data()
-            data_to_keep: dict[str: list[str]] = {"HomeTeam": ['FTHG', 'HTHG', 'HST', 'HS', 'HF', 'HC'],
-                                                  "AwayTeam": ['FTAG', 'HTAG', 'AST', 'AS', 'AF', 'AC']}
+            # HO, AO: 'Team Offsides',
+            # HFKC, AFKC: 'Team Free Kicks Conceded'
+            # Noch total spiele
+            data_to_keep: dict[str: list[str]] = {
+                "HomeTeam": ['FTHG', 'HTHG', 'HST', 'HS', 'HF', 'HC', 'HY', 'HR'],
+                "AwayTeam": ['FTAG', 'HTAG', 'AST', 'AS', 'AF', 'AC', 'AY', 'AR']}
 
-            new_names = ['Full Time Team Goals', 'Half Time Team Goals', 'Team Shots on Target', 'Team Shots',
-                         'Team Fouls Committed',
-                         'Team Corners']
+            new_names = ['Full Time Goals', 'Half Time Goals', 'Shots on Target', 'Shots',
+                         'Fouls Committed',
+                         'Corners', 'Yellow Cards', 'Red Cards']
 
             team_dfs: list[pd.DataFrame] = []
             for team in teams:
                 list_of_dfs: list[pd.DataFrame] = []
                 for team_type, columns in data_to_keep.items():
                     columns_to_keep = {element: "sum" for element in columns}
-                    new_df = df[df[team_type] == team]
+                    new_df = df[df[team_type].str.lower() == team.lower()]
                     new_df = new_df.loc[:, columns + ['Date', team_type]]
                     new_df = new_df.rename(columns={team_type: 'Team'})
                     new_df = new_df.groupby([new_df['Date'].dt.year, "Team"]).agg(columns_to_keep)
                     list_of_dfs.append(new_df)
-
                 combined_data = {}
                 for home_column, away_column, new_name in zip(data_to_keep["HomeTeam"], data_to_keep["AwayTeam"],
                                                               new_names):

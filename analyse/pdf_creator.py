@@ -38,6 +38,6 @@ class PdfCreator:
             except Exception as e:
                 print(f"Error with image generation: {e}")
 
-        file_name = f'exports/{team1}_vs_{team2}.pdf'
+        file_name = f'exports/{team1.replace(" ", "")}_vs_{team2.replace(" ", "")}.pdf'
         pdf.output(file_name, 'F')
         return file_name
