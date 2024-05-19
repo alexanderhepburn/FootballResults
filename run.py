@@ -1,4 +1,4 @@
-from misc import *
+from misc import setup_program
 
 # TODO update this
 # Command Execution Loop:
