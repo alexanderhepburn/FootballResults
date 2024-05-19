@@ -1,12 +1,9 @@
-import subprocess
-import sys
-import os
+from misc.helper_methods import SetupProgram
 
 if __name__ == '__main__':
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"], stdout=subprocess.DEVNULL,
-                          stderr=subprocess.DEVNULL)
-    os.makedirs("tmp", exist_ok=True)
-    os.makedirs("exports", exist_ok=True)
+    SetupProgram()  # Download all requirements
+
+    # Imported after SetupProgram to make sure all requirements have been downloaded
     from managers.command_manager import CommandManager
 
     CommandManager.run_program()

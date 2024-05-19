@@ -1,5 +1,7 @@
 import platform
 import os
+import subprocess
+import sys
 
 
 class Colour:
@@ -13,6 +15,15 @@ class Colour:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
     END = '\033[0m'
+
+
+class SetupProgram:
+    def __init__(self):
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"],
+                              stdout=subprocess.DEVNULL,
+                              stderr=subprocess.DEVNULL)
+        os.makedirs("tmp", exist_ok=True)
+        os.makedirs("exports", exist_ok=True)
 
 
 class SystemHandling:

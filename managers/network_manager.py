@@ -4,6 +4,7 @@ import os
 from tqdm import tqdm
 from misc.helper_methods import Colour
 from settings.league import League
+from settings.settings_manager import SettingsManager
 
 
 class network_manager:
@@ -15,9 +16,9 @@ class network_manager:
             url = f"https://www.football-data.co.uk/mmz4281/{formatted_year}/{league.name}.csv"
             response = requests.get(url)
 
-            os.makedirs(f"data/{league}", exist_ok=True)
+            os.makedirs(f"data/{league.name}", exist_ok=True)
 
-            output = open(f"data/{league}/{formatted_year}.csv", "wb")
+            output = open(f"data/{league.name}/{formatted_year}.csv", "wb")
             output.write(response.content)
             output.close()
         except Exception as e:
@@ -26,10 +27,9 @@ class network_manager:
     @staticmethod
     def get_all_data():
         print(f"{Colour.GREEN}Updating data!{Colour.END}")
-        settings = SettingsManager()
         accepted_leagues = [league for league in League]
-        # TODO Uodate
-        year_array = [x for x in range(2010, 2025)]
+        year_array = list(range(SettingsManager.settings_data[0].min,
+                                SettingsManager.settings_data[1].max + 1))
         total_iterations = len(year_array) * len(accepted_leagues)
         with tqdm(total=total_iterations) as pbar:
             for league in accepted_leagues:
