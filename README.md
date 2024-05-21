@@ -1,12 +1,15 @@
 # FootballResults
 
-A python based programm to visualize football data
+A python Project designed to analyze and visualize football data by comparing the performance
+of two teams and generating a detailed PDF report that includes plots and textual analysis.
+The program is organized into several scripts, each handling a specific part of the workflow.
 
 # Table of contents
 
 - Installation
-- Usage
-- Features
+- Usage and Features
+- How the Program works
+- Ideas for future Improvement
 - Contributing
 - License
 - Contact
@@ -25,41 +28,141 @@ A python based programm to visualize football data
 
     pip install -r requirements.txt
 
-# Usage
+# Usage and Features
 
-### Example of how to use the programm --> see run.py
+1. To Start the Program, run the ```run.py``` script
+2. The program will ask you to input a command
+3. to get an overview of the available commands, input ```help```
+4. Choose one of the following features:
 
-    from misc import setup_program
+- ```analyse``` create a report with two football teams of your choice
+- ```teams``` view the available teams in your selected league
+- ```settings``` view and change your current settings (you can change the years for the statistics here or change the
+  preferred league)
+- ```update_data``` update all data manually
 
-    if __name__ == '__main__':
-        setup_program()  # Download all requirements
-        # Imported after SetupProgram to make sure all requirements have been downloaded
-        from commands import run_program
+5. after you analyse two teams of your choice, the program will automatically create a PDF document of the football
+   statistics on your local drive
+6. You can repeat the steps if you want to analyse different teams in different leagues
 
-        run_program()
+# How the Program works
 
-### Command Execution Loop:
+## Key Components and their interactions
 
-- The program enters a loop where it waits for user input.
-- Upon receiving input, it checks if the input matches any available command.
-- If a match is found, the corresponding command is executed.
-- If no match is found, an error message is displayed indicating that the input is invalid.
+1. Main Script ```run.py```
 
-# Features
+- **Purpose:** Entry point for the program.
+- **Functionality:**
+  Calls ```setup_program.setup_program()``` to install dependencies and create necessary directories.
+  Runs the main loop provided by ```command_manager.run_program()``` to handle user inputs.
 
-### Available Commands:
+2. Setup ```setup_program.py```
 
-- Help Command: Provides a list of available commands and their descriptions.
-- Settings Command: Allows the user to view and modify program settings.
-- Teams Command: Displays a list of teams.
-- UpdateData Command: Updates or retrieves data required by the program.
-- Analyse Command: Performs analysis on specified data.
+- **Purpose:** Sets up the program environment.
+- **Functionality:**
+  Installs required dependencies from ```requirements.txt``` using ```subprocess```.
+  Creates ```tmp``` and ```exports``` directories if they do not exist.
+  Checks if the data directory exists and calls ```network_manager.get_all_data()``` if data needs to be downloaded.
 
-### Note:
+3. Command Management ```command.py```, ```commands.py```, ```command_manager.py```
 
-- This structure allows the program to be modular, with individual commands encapsulated in separate functions or
-  classes.
-  It promotes code organization, maintainability, and ease of adding new features or commands.
+- **Purpose:** Manages user commands.
+- **Classes and Functions:**
+    - ```Command``` Abstract base class for all commands. Implements common attributes and abstract
+      method ```execute()```.
+    - ```get_commands()``` Returns a list of command
+      instances (```Analyse```, ```Teams```, ```UpdateData```, ```Settings```).
+    - ```run_program()``` Main loop that prompts the user for commands, matches the input with available commands, and
+      executes the corresponding command’s ```execute()``` method.
+      Handles special commands like ```help``` to list all commands and ```end``` to terminate the program.
+
+4. Data Management ```data_manager.py```, ```network_manager.py```
+
+- **Purpose:** Handles data retrieval, downloading, and preparation.
+- **Functions:**
+    - ```data_manager.py```
+        - ```get_all_data()``` Reads CSV files from the ```data``` directory, combines them into a DataFrame, and
+          filters based on user settings.
+        - ```get_all_teams()``` Extracts and returns a list of unique team names from the data.
+        - ```get_data_with_columns()``` Retrieves and aggregates specific columns of data for the selected teams.
+    - ```etwork_manager.py```
+        - ```get_all_data()``` Downloads football data for all years and leagues, saves them as CSV files in
+          the ```data``` directory.
+
+5. PDF Creation ```pdf_creator.py```
+
+- **Purpose:** Generates a PDF report.
+- **Function:** ```create_pdf()``` Takes the team names and text content, creates a PDF with this information, and
+  embeds plots generated by the ```Plot``` class.
+
+6. Plotting ```plot.py```
+
+- **Purpose:** Generates visual plots comparing team performance metrics.
+- **Class:** ```Plot```
+    - **Methods:**
+        - ```__init__()``` Initializes the ```Plot``` object with data and team information, then
+          calls ```plot_bars()``` to create all required plots.
+        - ```create_bar()``` Creates individual bar plots for each specified metric and saves them as images.
+        - ```plot_bars()``` Iterates through the specified metrics, extracts the relevant data for the two teams, and
+          calls ```create_bar()``` for each metric.
+
+7. Analysis ```analyse.py```
+
+- **Purpose:** Orchestrates the analysis and report generation process.
+- **Class:** ```Analyse```
+    - **Method:** ```execute():```
+        - Prompts the user to input two team names.
+        - Validates the input and ensures two unique teams are selected.
+        - Calls ```analyse.analyse()``` to generate the report.
+        - Opens the generated PDF report using ```system_handling.open_file()```.
+
+8. Text Generation ```text_generator.py```
+
+- **Purpose:** Generates textual analysis for the PDF report.
+- **Functions:**
+    - ```generate_text()``` Placeholder function to generate text content for the report.
+- **Helper functions:* Calculate various statistics like games played, overall stats, win percentages, average goals,
+  card counts, shot accuracy, and correlations.
+    - ```T_generate_text()``` Compiles the calculated statistics into a comprehensive text format for inclusion in the
+      PDF report.
+
+9. Settings
+   Management ```settings_manager.py```, ```settings_object.py```, ```settings_option.py```, ```user_settings.py```
+
+- **Purpose:** Manages user settings.
+- **Classes:**
+    - **```SettingsManager```**
+        - Manages settings initialization, reset, and refresh.
+        - Provides methods to update settings and save them to a JSON file.
+    - **```SettingsObject```**
+        - Represents user settings with attributes for the starting year, ending year, and selected league.
+        - Provides methods to load default and user-defined settings from a JSON file.
+    - **```SettingsOption```**, **```RangeSettingsOption```**, **```ListSettingsOption**```
+        - Represent different types of settings options.
+        - Provide methods to validate and display setting options.
+    - **```UserSettings```**
+        - Singleton class that provides access to the current settings instance and updates settings.
+
+10. Utility ```system_handling.py```
+
+- **Purpose:** Handles system-specific tasks.
+- **Function:**
+    - ```open_file()``` Opens a file using the default application based on the operating system.
+
+# Ideas for future Improvement
+
+1. Enhanced Data Visualization:
+    - Interactive Plots: Use libraries like Plotly or Bokeh to create interactive plots, allowing users to hover over
+      data points for detailed insights and dynamic data exploration.
+      Expanded Data Analysis:
+
+2. Advanced Metrics:
+    - Introduce advanced football metrics such as Expected Goals, Passing Accuracy, and Possession Percentage to provide
+      deeper insights into team and player performance.
+
+3. User Interface Enhancements:Graphical User Interface (GUI):
+    - Develop a user-friendly GUI using frameworks like Tkinter, PyQt, or a web-based interface with Flask/Django to
+      improve accessibility and ease of use.
 
 # Contributing
 
@@ -71,12 +174,26 @@ A python based programm to visualize football data
 
 # License
 
-??? IS THERE A SPECIAL LICENSE? THIS IS A PROJECT FOR THE UNIVERSITY OF ST. GALLEN LOL
+MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to use, copy, modify, and distribute the Software without restriction, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 # Contact
 
 - Email: student@student.unisg.ch
 - linkedin: www.linkedin.com/in/student
 - GitHub: https://github.com/Student
+
+*Note:* This README contains placeholder information to demonstrate the structure and completeness of the document. The
+contact details are not real and are included only for illustrative purposes as we did not want to share our real
+contact details.
 
 
