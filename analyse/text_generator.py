@@ -1,11 +1,13 @@
 import pandas as pd
 import datetime
+from .data_manager import get_all_data
 import matplotlib as plt
 
 
 def generate_text(data: pd.DataFrame, team1: str, team2: str) -> str:
+    average_cards = average_cards_per_game(get_all_data(), team1, team2)
     # TODO Text generieren
-    return "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
+    return f"{team1} has an average of {average_cards[0]:.2f} yellow cards and {team2} an average of {average_cards[1]:.2f} per game! At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
 
 
 # This function calculates how often the two teams have played against each other in the past X years
@@ -64,13 +66,23 @@ def average_goals_per_half(data):
 
 
 # This function calculates the average number of yellow and red cards received per match per team
-def average_cards_per_game(data):
-    avg_yellow_cards_home = data['Home Yellow Cards'].mean()
-    avg_yellow_cards_away = data['Away Yellow Cards'].mean()
-    avg_red_cards_home = data['Home Red Cards'].mean()
-    avg_red_cards_away = data['Away Red Cards'].mean()
+def average_cards_per_game(data, team1, team2):
+    avg_yellow_team1 = data.apply(
+        lambda row: row['HY'] if row['HomeTeam'] == team1 else (row['AY'] if row['AwayTeam'] == team1 else None),
+        axis=1).dropna().mean()
 
-    return avg_yellow_cards_home, avg_yellow_cards_away, avg_red_cards_home, avg_red_cards_away
+    avg_yellow_team2 = data.apply(
+        lambda row: row['HY'] if row['HomeTeam'] == team2 else (row['AY'] if row['AwayTeam'] == team2 else None),
+        axis=1).dropna().mean()
+
+    return (avg_yellow_team1, avg_yellow_team2)
+
+    # avg_yellow_cards_home = data['Home Yellow Cards'].mean()
+    # avg_yellow_cards_away = data['Away Yellow Cards'].mean()
+    # avg_red_cards_home = data['Home Red Cards'].mean()
+    # avg_red_cards_away = data['Away Red Cards'].mean()
+    #
+    # return avg_yellow_cards_home, avg_yellow_cards_away, avg_red_cards_home, avg_red_cards_away
 
 
 # This function calculates the accuracy on shots
