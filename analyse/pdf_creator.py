@@ -19,7 +19,6 @@ def create_pdf(team1: str, team2: str, text: str) -> str:
     pdf = fpdf('P', 'mm', 'A4')  # A4 (210 by 297 mm)
 
     # Constants for page dimensions and margins
-    PHEIGHT = 297
     PWIDTH = 210
     MARGIN_SIDE = 7
 
@@ -28,7 +27,7 @@ def create_pdf(team1: str, team2: str, text: str) -> str:
     pdf.set_margins(MARGIN_SIDE, 0, MARGIN_SIDE)
 
     # Set font for title
-    pdf.set_font('Arial', 'B', 14)
+    pdf.set_font('Arial', 'B', 13)
 
     # Add title to the PDF
     pdf.set_x(pdf.l_margin)
@@ -45,7 +44,7 @@ def create_pdf(team1: str, team2: str, text: str) -> str:
                    border=0, align='J', fill=False)
 
     # Set initial positions for images
-    top_margin = 60
+    top_margin = 52
     height = 57
 
     # Add plots to the PDF

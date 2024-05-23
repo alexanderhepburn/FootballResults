@@ -1,7 +1,7 @@
 from analyse.pdf_creator import create_pdf
 from analyse.plot import Plot as p
-from .data_manager import get_data_with_columns
-from .text_generator import generate_text
+from .data_manager import get_data_with_columns, get_all_data
+from .text_generator import GenerateText
 
 
 def analyse(team1: str, team2: str) -> str:
@@ -31,7 +31,7 @@ def analyse(team1: str, team2: str) -> str:
     ])
 
     # Generate the PDF report
-    pdf_name = create_pdf(team1, team2, generate_text(team_data, team1, team2))
+    pdf_name = create_pdf(team1, team2, GenerateText(get_all_data(), team1, team2).get_text())
 
     # Return the file name of the generated PDF
     return pdf_name

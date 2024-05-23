@@ -1,207 +1,199 @@
 import pandas as pd
-import datetime
-from .data_manager import get_all_data
-import matplotlib as plt
+from settings import UserSettings
 
 
-def generate_text(data: pd.DataFrame, team1: str, team2: str) -> str:
-    average_cards = average_cards_per_game(get_all_data(), team1, team2)
-    # TODO Text generieren
-    return f"{team1} has an average of {average_cards[0]:.2f} yellow cards and {team2} an average of {average_cards[1]:.2f} per game! At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
+class GenerateText:
+    """
+    A class to generate descriptive text based on football match statistics
+    between two specified teams.
 
+    Attributes:
+    data (pd.DataFrame): DataFrame containing match data.
+    team1 (str): Name of the first team.
+    team2 (str): Name of the second team.
+    matches (pd.DataFrame): Filtered DataFrame containing matches between the two teams.
+    highest_win (str): Description of the match with the highest win.
+    avg_yellow_cards (tuple): Average yellow cards per game for both teams.
+    avg_red_cards (tuple): Average red cards per game for both teams.
+    shot_accuracy_team1 (float): Shot accuracy for team1.
+    shot_accuracy_team2 (float): Shot accuracy for team2.
+    avg_first_half_goals (float): Average goals scored in the first half.
+    avg_second_half_goals (float): Average goals scored in the second half.
+    team1_wins (int): Number of wins for team1.
+    team1_losses (int): Number of losses for team1.
+    draws (int): Number of draws between the two teams.
 
-# This function calculates how often the two teams have played against each other in the past X years
-def games_played_between_teams(data, team1, team2, years):
-    # Filter the data for matches between the two teams
-    recent_years = datetime.now().year - years
-    filtered_data = data[(data['Date'].dt.year >= recent_years) &
-                         (((data['Home Team'] == team1) & (data['Away Team'] == team2)) |
-                          ((data['Home Team'] == team2) & (data['Away Team'] == team1)))]
-    return len(filtered_data)
+    Methods:
+    _calculate_all_stats(): Calculate all necessary statistics for the matches.
+    get_text() -> str: Generate a descriptive text based on the calculated statistics.
+    overall_stats(): Calculate overall statistics for wins, losses, and draws for the teams.
+    calculate_highest_win(): Calculate the highest win between the two teams based on goal difference.
+    win_percentage_when_leading_at_half(home=True) -> float: Calculate the win percentage when leading at halftime.
+    average_cards_per_game(yellow_card=True) -> tuple: Calculate the average number of yellow or red cards per game for both teams.
+    average_goals_per_half() -> None: Calculate the average number of goals scored in the first and second half.
+    calculate_shot_accuracy() -> tuple: Calculate the shot accuracy for both teams.
+    """
 
+    def __init__(self, data: pd.DataFrame, team1: str, team2: str):
+        """
+        Initialize the GenerateText class with match data and teams.
 
-# This function calculates the overall statistics for wins, draws and defeats for the two teams
-def overall_stats(data, team1, team2):
-    team1_wins = len(data[((data['Home Team'] == team1) & (data['Result'] == 'H')) |
-                          ((data['Away Team'] == team1) & (data['Result'] == 'A'))])
+        Parameters:
+        data (pd.DataFrame): DataFrame containing match data.
+        team1 (str): Name of the first team.
+        team2 (str): Name of the second team.
+        """
+        self.data = data
+        self.team1 = team1
+        self.team2 = team2
 
-    team2_wins = len(data[((data['Home Team'] == team2) & (data['Result'] == 'H')) |
-                          ((data['Away Team'] == team2) & (data['Result'] == 'A'))])
+        # Filter matches between the two teams
+        self.matches = self.data[((self.data['HomeTeam'] == self.team1) & (self.data['AwayTeam'] == self.team2)) |
+                                 ((self.data['HomeTeam'] == self.team2) & (self.data['AwayTeam'] == self.team1))]
 
-    draws = len(data[data['Result'] == 'D'])
+        # Calculate all statistics
+        self._calculate_all_stats()
 
-    team1_losses = len(data[((data['Home Team'] == team1) & (data['Result'] == 'A')) |
-                            ((data['Away Team'] == team1) & (data['Result'] == 'H'))])
+    def _calculate_all_stats(self) -> None:
+        """
+        Calculate all necessary statistics for the matches.
+        """
+        self.overall_stats()
+        self.calculate_highest_win()
+        self.average_goals_per_half()
+        self.avg_yellow_cards = self.average_cards_per_game(yellow_card=True)
+        self.avg_red_cards = self.average_cards_per_game(yellow_card=False)
+        self.shot_accuracy_team1, self.shot_accuracy_team2 = self.calculate_shot_accuracy()
 
-    team2_losses = len(data[((data['Home Team'] == team2) & (data['Result'] == 'A')) |
-                            ((data['Away Team'] == team2) & (data['Result'] == 'H'))])
+    def get_text(self) -> str:
+        """
+        Generate a descriptive text based on the calculated statistics.
 
-    return team1_wins, team2_wins, draws, team1_losses, team2_losses
+        Returns:
+        str: A formatted string with match statistics and comparisons.
+        """
+        return (f"During {UserSettings.get_instance().starting_year} and {UserSettings.get_instance().ending_year}, "
+                f"{self.team1} played {len(self.matches)} games against {self.team2}, winning {self.team1_wins}, "
+                f"losing {self.team1_losses} and drawing {self.draws} games. On average, {self.avg_first_half_goals:.1f} "
+                f"goals were scored in the first half and {self.avg_second_half_goals:.1f} goals in the second. {self.highest_win} "
+                f"was the highest win in this time period. {self.team1} had an average of {self.avg_yellow_cards[0]:.2f} yellow cards "
+                f"and {self.avg_red_cards[0]:.2f} red cards per game. {self.team2} had an average of {self.avg_yellow_cards[1]:.2f} yellow cards "
+                f"and {self.avg_red_cards[1]:.2f} red cards per game. {self.team1} had a shooting accuracy of {self.shot_accuracy_team1:.0f}% while "
+                f"{self.team2} had an accuracy of {self.shot_accuracy_team2:.0f}%. In the entire league, when the home team was leading at halftime, "
+                f"{self.win_percentage_when_leading_at_half(home=True)}% of the time they won the game, whereas when the away team was leading, "
+                f"{self.win_percentage_when_leading_at_half(home=False)}% of games were won.")
 
+    def overall_stats(self) -> None:
+        """
+        Calculate overall statistics for wins, losses, and draws for the teams.
+        """
+        self.team1_wins = self.matches[((self.matches['HomeTeam'] == self.team1) & (self.matches['FTR'] == 'H')) |
+                                       ((self.matches['AwayTeam'] == self.team1) & (self.matches['FTR'] == 'A'))].shape[
+            0]
 
-# This function calculates the percentage by which the home team will win the match if it is leading at half-time
-def home_win_when_leading_at_half(data):
-    leading_at_half = data[(data['Half Time Home Goals'] > data['Half Time Away Goals'])]
-    home_wins = leading_at_half[leading_at_half['Result'] == 'H']
-    return len(home_wins) / len(leading_at_half) * 100 if len(leading_at_half) > 0 else 0
+        self.team1_losses = self.matches[((self.matches['HomeTeam'] == self.team2) & (self.matches['FTR'] == 'H')) |
+                                         ((self.matches['AwayTeam'] == self.team2) & (
+                                                 self.matches['FTR'] == 'A'))].shape[0]
 
+        self.draws = self.matches[self.matches['FTR'] == 'D'].shape[0]
 
-# This function calculates the percentage by which the away team will win the match if it is leading at half-time
-def away_win_when_leading_at_half(data):
-    leading_at_half = data[(data['Half Time Away Goals'] > data['Half Time Home Goals'])]
-    away_wins = leading_at_half[leading_at_half['Result'] == 'A']
-    return len(away_wins) / len(leading_at_half) * 100 if len(leading_at_half) > 0 else 0
+    def calculate_highest_win(self) -> None:
+        """
+        Calculate the highest win between the two teams based on goal difference.
+        """
+        # Calculate the goal difference without modifying self.matches directly
+        goal_diff = (self.matches['FTHG'] - self.matches['FTAG']).abs()
 
+        # Combine the goal difference with the matches DataFrame temporarily
+        temp_matches = self.matches.copy()
+        temp_matches['GoalDiff'] = goal_diff
 
-# This function calculates the average number of goals scored between the two teams in the first and second half
-def average_goals_per_half(data):
-    first_half_goals = data['Half Time Home Goals'] + data['Half Time Away Goals']
-    second_half_goals = (data['Full Time Home Goals'] - data['Half Time Home Goals']) + (
-            data['Full Time Away Goals'] - data['Half Time Away Goals'])
+        # Find the match with the highest goal difference
+        highest_win_match = temp_matches.loc[temp_matches['GoalDiff'].idxmax()]
 
-    avg_first_half_goals = first_half_goals.mean()
-    avg_second_half_goals = second_half_goals.mean()
+        if highest_win_match['FTHG'] > highest_win_match['FTAG']:
+            result = f"{highest_win_match['HomeTeam']} {highest_win_match['FTHG']:.0f}:{highest_win_match['FTAG']:.0f} {highest_win_match['AwayTeam']}"
+        else:
+            result = f"{highest_win_match['AwayTeam']} {highest_win_match['FTAG']:.0f}:{highest_win_match['FTHG']:.0f} {highest_win_match['HomeTeam']}"
 
-    return avg_first_half_goals, avg_second_half_goals
+        self.highest_win = result
 
+    def win_percentage_when_leading_at_half(self, home=True) -> float:
+        """
+        Calculate the win percentage when leading at halftime.
 
-# This function calculates the average number of yellow and red cards received per match per team
-def average_cards_per_game(data, team1, team2):
-    avg_yellow_team1 = data.apply(
-        lambda row: row['HY'] if row['HomeTeam'] == team1 else (row['AY'] if row['AwayTeam'] == team1 else None),
-        axis=1).dropna().mean()
+        Parameters:
+        home (bool): True if calculating for home team, False for away team.
 
-    avg_yellow_team2 = data.apply(
-        lambda row: row['HY'] if row['HomeTeam'] == team2 else (row['AY'] if row['AwayTeam'] == team2 else None),
-        axis=1).dropna().mean()
+        Returns:
+        float: Win percentage when leading at halftime.
+        """
+        leading_at_half = self.data[self.data['HTHG'] > self.data['HTAG']] if home else self.data[
+            self.data['HTAG'] > self.data['HTHG']]
+        wins = leading_at_half[leading_at_half['FTR'] == ('H' if home else 'A')]
 
-    return (avg_yellow_team1, avg_yellow_team2)
+        percentage = (len(wins) / len(leading_at_half) * 100) if len(leading_at_half) > 0 else 0
+        return round(percentage)
 
-    # avg_yellow_cards_home = data['Home Yellow Cards'].mean()
-    # avg_yellow_cards_away = data['Away Yellow Cards'].mean()
-    # avg_red_cards_home = data['Home Red Cards'].mean()
-    # avg_red_cards_away = data['Away Red Cards'].mean()
-    #
-    # return avg_yellow_cards_home, avg_yellow_cards_away, avg_red_cards_home, avg_red_cards_away
+    def average_cards_per_game(self, yellow_card=True) -> tuple:
+        """
+        Calculate the average number of yellow or red cards per game for both teams.
 
+        Parameters:
+        yellow_card (bool): True to calculate yellow cards, False for red cards.
 
-# This function calculates the accuracy on shots
-def calculate_shot_accuracy(data):
-    home_shots = data['Home Shots']
-    away_shots = data['Away Shots']
-    home_shots_on_target = data['Home Shots on Target']
-    away_shots_on_target = data['Away Shots on Target']
+        Returns:
+        tuple: Average number of cards per game for team1 and team2.
+        """
+        card_type = 'Y' if yellow_card else 'R'
+        home_card_column = f'H{card_type}'
+        away_card_column = f'A{card_type}'
 
-    home_accuracy = (home_shots_on_target.sum() / home_shots.sum()) * 100 if home_shots.sum() > 0 else 0
-    away_accuracy = (away_shots_on_target.sum() / away_shots.sum()) * 100 if away_shots.sum() > 0 else 0
+        avg_cards_team1 = self.data.apply(
+            lambda row: row[home_card_column] if row['HomeTeam'] == self.team1 else (
+                row[away_card_column] if row['AwayTeam'] == self.team1 else None),
+            axis=1).dropna().mean()
 
-    return home_accuracy, away_accuracy
+        avg_cards_team2 = self.data.apply(
+            lambda row: row[home_card_column] if row['HomeTeam'] == self.team2 else (
+                row[away_card_column] if row['AwayTeam'] == self.team2 else None),
+            axis=1).dropna().mean()
 
+        return avg_cards_team1, avg_cards_team2
 
-# This function calculates relevant correlations
-def calculate_relevant_correlations(data):
-    # Relevant metrics for the correlation
-    metrics = ['Fouls Committed', 'Corners', 'Shots on Target', 'Shots', 'Yellow Cards', 'Red Cards']
+    def average_goals_per_half(self) -> None:
+        """
+        Calculate the average number of goals scored in the first and second half.
 
-    # Add a binary column for win (1) and loss (0)
-    data['Home Win'] = data['Result'].apply(lambda x: 1 if x == 'H' else 0)
-    data['Away Win'] = data['Result'].apply(lambda x: 1 if x == 'A' else 0)
+        Returns:
+        None
+        """
+        first_half_goals = self.matches['HTHG'] + self.matches['HTAG']
+        second_half_goals = (self.matches['FTHG'] - self.matches['HTHG']) + (
+                self.matches['FTAG'] - self.matches['HTAG'])
 
-    # Add the win columns to the metrics
-    metrics += ['Home Win', 'Away Win']
+        self.avg_first_half_goals = first_half_goals.mean()
+        self.avg_second_half_goals = second_half_goals.mean()
 
-    # Calculate the correlations
-    correlation_matrix = data[metrics].corr()
+    def calculate_shot_accuracy(self) -> tuple:
+        """
+        Calculate the shot accuracy for both teams.
 
-    # Find the highest correlation
-    corr = correlation_matrix.unstack()
-    corr = corr[corr.index.get_level_values(0) != corr.index.get_level_values(1)]
-    highest_corr = corr.abs().sort_values(ascending=False).head(1).index[0]
-    highest_corr_value = corr.loc[highest_corr]
+        Returns:
+        tuple: Shot accuracy for team1 and team2.
+        """
 
-    return correlation_matrix, highest_corr, highest_corr_value
+        def shot_accuracy(team: str) -> float:
+            """Helper function to calculate shot accuracy for a given team"""
+            team_home = self.data[self.data['HomeTeam'] == team]
+            team_away = self.data[self.data['AwayTeam'] == team]
 
+            shots = team_home['HS'].sum() + team_away['AS'].sum()
+            shots_on_target = team_home['HST'].sum() + team_away['AST'].sum()
 
-###################### TEXT IN PDF
+            accuracy = (shots_on_target / shots) * 100 if shots > 0 else 0
+            return accuracy
 
-def T_generate_text(data: pd.DataFrame, team1: str, team2: str) -> str:
-    home_win_percentage = home_win_when_leading_at_half(data)
-    away_win_percentage = away_win_when_leading_at_half(data)
-    avg_first_half, avg_second_half = average_goals_per_half(data)
-    avg_yellow_home, avg_yellow_away, avg_red_home, avg_red_away = average_cards_per_game(data)
-
-    # Calculate the number of games played between the teams in the past X years
-    # games_played = games_played_between_teams(data, team1, team2, years)
-
-    # Calculate overall statistics
-    team1_wins, team2_wins, draws, team1_losses, team2_losses = overall_stats(data, team1, team2)
-
-    text = ""
-    # text = f"In the past {years} years, {team1} and {team2} have played against each other {games_played} times.\n\n"
-    text += f"{team1} Overall Stats: {team1_wins} Wins, {team1_losses} Losses, {draws} Draws\n"
-    text += f"{team2} Overall Stats: {team2_wins} Wins, {team2_losses} Losses, {draws} Draws\n\n"
-    text += f"In {home_win_percentage:.2f}% of the games, {team1} wins when leading at halftime.\n"
-    text += f"In {away_win_percentage:.2f}% of the games, {team2} wins when leading at halftime.\n"
-    text += f"Average number of goals in the first half: {avg_first_half:.2f}\n"
-    text += f"Average number of goals in the second half: {avg_second_half:.2f}\n"
-    text += f"Average number of yellow cards per game ({team1}): {avg_yellow_home:.2f}\n"
-    text += f"Average number of yellow cards per game ({team2}): {avg_yellow_away:.2f}\n"
-    text += f"Average number of red cards per game ({team1}): {avg_red_home:.2f}\n"
-    text += f"Average number of red cards per game ({team2}): {avg_red_away:.2f}\n"
-
-    # description for highest correlation
-    # metric1, metric2 = highest_corr
-    # description = (
-    #     f"\nThe highest correlation is between {metric1} and {metric2} with a value of {highest_corr_value:.2f}. "
-    #     f"This means that as {metric1} increases, {metric2} tends to increase as well (or decrease, if the value is negative). "
-    #     "A high positive correlation (close to +1) indicates that these two metrics move in the same direction, "
-    #     "while a high negative correlation (close to -1) indicates that they move in opposite directions. "
-    #     "For example, if the correlation is between 'Home Shots on Target' and 'Home Win', it suggests that the more shots on target "
-    #     "the home team has, the more likely they are to win."
-    # )
-    # text
-    # 1 = description
-
-    return text
-
-    ###################### PLOTS
-
-    # Pie plot for overall statistics
-
-
-def plot_overall_stats(team1, team2, team1_wins, team2_wins, draws, team1_losses, team2_losses):
-    # Data for the pie plot
-    labels = [f'{team1} Wins', 'Draws', f'{team2} Wins']
-    sizes = [team1_wins, draws, team2_wins]
-    colors = ['#ff9999', '#66b3ff', '#99ff99']
-
-    fig1, ax1 = plt.subplots()
-    ax1.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%',
-            shadow=True, startangle=90)
-    ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-
-    plt.title('Overall Statistics')
-
-    # Bar plot for shot accuracy
-
-
-def plot_shot_accuracy(team1, team2, home_accuracy, away_accuracy):
-    labels = [team1, team2]
-    accuracies = [home_accuracy, away_accuracy]
-
-    plt.figure(figsize=(8, 6))
-    plt.bar(labels, accuracies, color=['blue', 'red'])
-    plt.xlabel('Teams')
-    plt.ylabel('Shot Accuracy (%)')
-    plt.title('Percentage of Shots on Target')
-    plt.ylim(0, 100)
-
-    for i in range(len(accuracies)):
-        plt.text(i, accuracies[i] + 1, f'{accuracies[i]:.2f}%', ha='center', va='bottom')
-
-    # Correlation plot (heatmap)
-
-# def plot_correlation_heatmap(correlation_matrix):
-#     plt.figure(figsize=(10, 8))
-#     sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f")
-#     plt.title('Correlation Matrix')
+        team1_accuracy = shot_accuracy(self.team1)
+        team2_accuracy = shot_accuracy(self.team2)
+        return team1_accuracy, team2_accuracy

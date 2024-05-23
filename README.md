@@ -1,15 +1,15 @@
 # FootballResults
 
-A python Project designed to analyze and visualize football data by comparing the performance
+A python project designed to analyze and visualize football data by comparing the performance
 of two teams and generating a detailed PDF report that includes plots and textual analysis.
 The program is organized into several scripts, each handling a specific part of the workflow.
 
-# Table of contents
+# Table of Contents
 
 - Installation
 - Usage and Features
-- How the Program works
-- Ideas for future Improvement
+- How the Program Works
+- Ideas for Future Improvement
 - Contributing
 - License
 - Contact
@@ -30,7 +30,7 @@ The program is organized into several scripts, each handling a specific part of 
 
 # Usage and Features
 
-1. To Start the Program, run the ```run.py``` script
+1. To start the program, run the ```run.py``` script
 2. The program will ask you to input a command
 3. to get an overview of the available commands, input ```help```
 4. Choose one of the following features:
@@ -45,11 +45,11 @@ The program is organized into several scripts, each handling a specific part of 
    statistics on your local drive
 6. You can repeat the steps if you want to analyse different teams in different leagues
 
-# How the Program works
+# How the Program Works
 
-## Key Components and their interactions
+## Key Components and Their Interactions
 
-1. Main Script ```run.py```
+1. Main script ```run.py```
 
 - **Purpose:** Entry point for the program.
 - **Functionality:**
@@ -64,7 +64,7 @@ The program is organized into several scripts, each handling a specific part of 
   Creates ```tmp``` and ```exports``` directories if they do not exist.
   Checks if the data directory exists and calls ```network_manager.get_all_data()``` if data needs to be downloaded.
 
-3. Command Management ```command.py```, ```commands.py```, ```command_manager.py```
+3. Command management ```command.py```, ```commands.py```, ```command_manager.py```
 
 - **Purpose:** Manages user commands.
 - **Classes and Functions:**
@@ -76,7 +76,7 @@ The program is organized into several scripts, each handling a specific part of 
       executes the corresponding command’s ```execute()``` method.
       Handles special commands like ```help``` to list all commands and ```end``` to terminate the program.
 
-4. Data Management ```data_manager.py```, ```network_manager.py```
+4. Data management ```data_manager.py```, ```network_manager.py```
 
 - **Purpose:** Handles data retrieval, downloading, and preparation.
 - **Functions:**
@@ -89,7 +89,7 @@ The program is organized into several scripts, each handling a specific part of 
         - ```get_all_data()``` Downloads football data for all years and leagues, saves them as CSV files in
           the ```data``` directory.
 
-5. PDF Creation ```pdf_creator.py```
+5. PDF creation ```pdf_creator.py```
 
 - **Purpose:** Generates a PDF report.
 - **Function:** ```create_pdf()``` Takes the team names and text content, creates a PDF with this information, and
@@ -121,7 +121,7 @@ The program is organized into several scripts, each handling a specific part of 
 - **Purpose:** Generates textual analysis for the PDF report.
 - **Functions:**
     - ```generate_text()``` Placeholder function to generate text content for the report.
-- **Helper functions:* Calculate various statistics like games played, overall stats, win percentages, average goals,
+- **Helper functions:** Calculate various statistics like games played, overall stats, win percentages, average goals,
   card counts, shot accuracy, and correlations.
     - ```T_generate_text()``` Compiles the calculated statistics into a comprehensive text format for inclusion in the
       PDF report.
@@ -149,18 +149,18 @@ The program is organized into several scripts, each handling a specific part of 
 - **Function:**
     - ```open_file()``` Opens a file using the default application based on the operating system.
 
-# Ideas for future Improvement
+# Ideas for Future Improvement
 
-1. Enhanced Data Visualization:
-    - Interactive Plots: Use libraries like Plotly or Bokeh to create interactive plots, allowing users to hover over
+1. Enhanced data visualization:
+    - Interactive plots: Use libraries like Plotly or Bokeh to create interactive plots, allowing users to hover over
       data points for detailed insights and dynamic data exploration.
-      Expanded Data Analysis:
+      Expanded data analysis:
 
-2. Advanced Metrics:
-    - Introduce advanced football metrics such as Expected Goals, Passing Accuracy, and Possession Percentage to provide
+2. Advanced metrics:
+    - Introduce advanced football metrics such as expected goals, passing accuracy, and possession percentage to provide
       deeper insights into team and player performance.
 
-3. User Interface Enhancements:Graphical User Interface (GUI):
+3. User interface enhancements:graphical user interface (GUI):
     - Develop a user-friendly GUI using frameworks like Tkinter, PyQt, or a web-based interface with Flask/Django to
       improve accessibility and ease of use.
 
