@@ -44,15 +44,15 @@ def create_pdf(team1: str, team2: str, text: str) -> str:
                    border=0, align='J', fill=False)
 
     # Set initial positions for images
-    top_margin = 52
-    height = 57
+    TOPMARGIN = 52
+    HEIGHT = 61
 
     # Add plots to the PDF
     for i in range(1, 9):
         try:
             # Attempt to add image to the PDF
             pdf.image(f'tmp/plot{i}.png', x=(0 if i % 2 != 0 else 1) * 96 + 7,
-                      y=top_margin + ((i - 1) // 2) * height, w=100)
+                      y=TOPMARGIN + ((i - 1) // 2) * HEIGHT, w=100)
         except Exception as e:
             print(f"Error with image generation: {e}")
 

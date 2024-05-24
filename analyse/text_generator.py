@@ -1,4 +1,5 @@
 import pandas as pd
+
 from settings import UserSettings
 
 
@@ -70,6 +71,7 @@ class GenerateText:
         self.avg_yellow_cards = self.average_cards_per_game(yellow_card=True)
         self.avg_red_cards = self.average_cards_per_game(yellow_card=False)
         self.shot_accuracy_team1, self.shot_accuracy_team2 = self.calculate_shot_accuracy()
+        self.calculate_relevant_correlations()
 
     def get_text(self) -> str:
         """
@@ -125,7 +127,8 @@ class GenerateText:
 
     def win_percentage_when_leading_at_half(self, home=True) -> float:
         """
-        Calculate the win percentage when leading at halftime.
+        Calculate the win percentage by which the home or away team will win the match if it is leading at halftime.
+        (Over the entire period and not just in a head-to-head comparison)
 
         Parameters:
         home (bool): True if calculating for home team, False for away team.
@@ -168,15 +171,18 @@ class GenerateText:
 
     def average_goals_per_half(self) -> None:
         """
-        Calculate the average number of goals scored in the first and second half.
+        Calculate the average number of goals scored between the two teams in the first and second half.
 
         Returns:
         None
         """
+        # Calculate the total number of goals scored in the first half
         first_half_goals = self.matches['HTHG'] + self.matches['HTAG']
+        # Calculate the total number of goals scored in the second half
         second_half_goals = (self.matches['FTHG'] - self.matches['HTHG']) + (
                 self.matches['FTAG'] - self.matches['HTAG'])
 
+        # Calculate the average number of goals for each half
         self.avg_first_half_goals = first_half_goals.mean()
         self.avg_second_half_goals = second_half_goals.mean()
 
@@ -202,3 +208,31 @@ class GenerateText:
         team1_accuracy = shot_accuracy(self.team1)
         team2_accuracy = shot_accuracy(self.team2)
         return team1_accuracy, team2_accuracy
+
+    def calculate_relevant_correlations(self):
+        """
+        Calculate the relevant correlations.
+
+        Returns:
+        DataFrame: correlation matrix
+        """
+        # Relevant metrics for the correlation
+        metrics = ['HF', 'AF', 'HC', 'AC', 'HS', 'AS', 'HY', 'AY', 'HR', 'AR']
+
+        # Create a binary win/loss column for home and away
+        self.data['HomeWin'] = self.data['FTR'].apply(lambda x: 1 if x == 'H' else 0)
+        self.data['AwayWin'] = self.data['FTR'].apply(lambda x: 1 if x == 'A' else 0)
+
+        # Add these win columns to the metrics
+        metrics += ['HomeWin', 'AwayWin']
+
+        # Create the correlation matrix
+        correlation_matrix = self.data[metrics].corr()
+
+        # Rename the columns and index
+        new_labels = ['Home Fouls', 'Away Fouls', 'Home Corners', 'Away Corners', 'Home Shots', 'Away Shots',
+                      'Home Yellow', 'Away Yellow', 'Home Red', 'Away Red', 'Home Win', 'Away Win']
+        correlation_matrix.columns = new_labels
+        correlation_matrix.index = new_labels
+
+        self.correlation_matrix = correlation_matrix

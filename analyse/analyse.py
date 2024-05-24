@@ -19,18 +19,18 @@ def analyse(team1: str, team2: str) -> str:
     # Retrieve data for the specified teams with the necessary columns
     team_data = get_data_with_columns([team1, team2])
 
+    information = GenerateText(get_all_data(), team1, team2)
+
     # Plot the performance data for the specified metrics
     p(team_data, team1, team2, [
         'Full Time Goals',
-        'Half Time Goals',
         'Shots on Target',
-        'Shots',
         'Fouls Committed',
         'Corners',
         'Yellow Cards',
         'Red Cards'
-    ])
+    ], information.team1_wins, information.team1_losses, information.draws, information.correlation_matrix)
     # Generate the PDF report
-    pdf_name = create_pdf(team1, team2, GenerateText(get_all_data(), team1, team2).get_text())
+    pdf_name = create_pdf(team1, team2, information.get_text())
     # Return the file name of the generated PDF
     return pdf_name
