@@ -8,7 +8,9 @@ The program is organized into several scripts, each handling a specific part of 
 
 - Installation
 - Usage and Features
+- Debugging
 - How the Program Works
+- Limitations of the Program
 - Ideas for Future Improvement
 - Contributing
 - License
@@ -166,6 +168,14 @@ Run the script (make sure you are in the FootballResults directory):
 - **Purpose:** Handles system-specific tasks.
 - **Function:**
     - ```open_file()``` Opens a file using the default application based on the operating system.
+
+# Limitations of the Program
+
+- Data Source: The program uses data from https://www.football-data.co.uk
+- Date Range: Analysis is limited to data from 2010 to 2024.
+- Data Variability: The available data can vary by year, with some parameters (e.g., corners) being recorded in select
+  years.
+  There may also be gaps in the data if a team was relegated from a league.
 
 # Ideas for Future Improvement
 
