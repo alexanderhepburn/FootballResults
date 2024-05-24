@@ -173,9 +173,8 @@ Run the script (make sure you are in the FootballResults directory):
 
 - Data Source: The program uses data from https://www.football-data.co.uk
 - Date Range: Analysis is limited to data from 2010 to 2024.
-- Data Variability: The available data can vary by year, with some parameters (e.g., corners) being recorded in select
-  years.
-  There may also be gaps in the data if a team was relegated from a league.
+- Data Variability: The available data can vary by year, with some parameters not being recorded since 2010. There may
+  also be gaps in the data if a team was relegated from a league.
 
 # Ideas for Future Improvement
 
