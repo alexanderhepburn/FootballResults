@@ -45,6 +45,24 @@ The program is organized into several scripts, each handling a specific part of 
    statistics on your local drive
 6. You can repeat the steps if you want to analyse different teams in different leagues
 
+# Debugging
+
+If the programm has any errors, try creating a virtual environment and installing all requirements:
+
+    python3 -m venv myenv
+
+Replace myenv with your environment name and run the environment:
+
+    source myenv/bin/activate
+
+Install the requirements:
+
+    pip install -r requirements.txt
+
+Run the script (make sure you are in the FootballResults directory):
+
+    python3 run.py
+
 # How the Program Works
 
 ## Key Components and Their Interactions
