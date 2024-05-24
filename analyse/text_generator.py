@@ -46,11 +46,17 @@ class GenerateText:
         self.data = data
         self.team1 = team1
         self.team2 = team2
-
         # Filter matches between the two teams
-        self.matches = self.data[((self.data['HomeTeam'] == self.team1) & (self.data['AwayTeam'] == self.team2)) |
-                                 ((self.data['HomeTeam'] == self.team2) & (self.data['AwayTeam'] == self.team1))]
+        try:
+            self.matches = self.data[((self.data['HomeTeam'] == self.team1) & (self.data['AwayTeam'] == self.team2)) |
+                                     ((self.data['HomeTeam'] == self.team2) & (self.data['AwayTeam'] == self.team1))]
 
+            # Check that the teams have played against each other and raise ValueError if not
+            if len(self.matches) == 0:
+                raise ValueError
+        except Exception:
+            # Pass the ValueError up to commands/analyse.py
+            raise ValueError
         # Calculate all statistics
         self._calculate_all_stats()
 
@@ -102,10 +108,9 @@ class GenerateText:
         Calculate the highest win between the two teams based on goal difference.
         """
         # Calculate the goal difference without modifying self.matches directly
-        goal_diff = (self.matches['FTHG'] - self.matches['FTAG']).abs()
-
-        # Combine the goal difference with the matches DataFrame temporarily
         temp_matches = self.matches.copy()
+        goal_diff = (temp_matches['FTHG'] - temp_matches['FTAG']).abs()
+        # Combine the goal difference with the matches DataFrame temporarily
         temp_matches['GoalDiff'] = goal_diff
 
         # Find the match with the highest goal difference

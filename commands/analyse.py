@@ -40,12 +40,17 @@ class Analyse(Command):
         print(f"{BLUE}Starting analyse...{END}")
 
         # Generate report file and get file name
-        analyse_data = analyse(team_list[0], team_list[1])
+        try:
+            analyse_data = analyse(team_list[0], team_list[1])
 
-        # Print success message with file location
-        print(
-            f"{GREEN}Success! {BLUE}Report has been generated in the folder exports. Opening file.{END}")
-        print(
-            f"{BLUE}The file name is located at: {analyse_data}{END}")
+            # Print success message with file location
+            print(
+                f"{GREEN}Success! {BLUE}Report has been generated in the folder exports. Opening file.{END}")
+            print(
+                f"{BLUE}The file name is located at: {analyse_data}{END}")
 
-        open_file(analyse_data)  # Open the report file
+            open_file(analyse_data)  # Open the report file
+        except ValueError:
+            print(f"{RED}Unable to create a Report for {team_list[0]} and {team_list[1]}")
+            print(
+                f"{BLUE}Please choose two teams that have had a match against each other in your selected time period.{END}")

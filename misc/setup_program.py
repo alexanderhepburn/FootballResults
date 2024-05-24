@@ -3,7 +3,7 @@ import subprocess
 import sys
 
 from misc.colour import *
-from .network_manager import get_all_data
+from .network_manager import download_all_data
 
 
 def setup_program():
@@ -27,4 +27,4 @@ def setup_program():
     # Check if the data directory exists
     if not os.path.isdir(f'{parent_directory}/data'):
         print(f"{BLUE}Data upgrade required.")  # Print a message indicating data upgrade is needed
-        get_all_data()  # If data direc
+        download_all_data()

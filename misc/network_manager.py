@@ -8,7 +8,7 @@ from misc import *
 from settings import *
 
 
-def get_all_data():
+def download_all_data():
     """
     Downloads data for all years and leagues.
 
