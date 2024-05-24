@@ -196,4 +196,6 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 contact details are not real and are included only for illustrative purposes as we did not want to share our real
 contact details.
 
+# Disclaimer
 
+This project has utilized ChatGPT for assistance with various code snippets and project documentation.
